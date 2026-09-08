@@ -1,125 +1,94 @@
-# MediGuid — Healthcare & Medication Guidance Application
+﻿# MediGuid — Healthcare & Medication Guidance Platform
 
-> **Design System:** Pastel Mint `#D8EFE9`, Vibrant Medical Teal `#20B2AA`, Dark Teal `#168F8A`, Light Mint `#EAF7F4`, White Surfaces, Large Rounded Corners (20–28px), Soft Shadows, Pill Buttons, and Minimal Medical Line Icons.
-
----
-
-## 🌟 Overview
-
-**MediGuid** is a unified healthcare and medication management application built to provide patients with an intuitive, calm, and reassuring medical companion. Every screen strictly follows the medical design system:
-
-- **Pastel Mint Background (`#D8EFE9`)**: Soft, fresh, and glare-free background with subtle gradient accents.
-- **Primary Teal (`#20B2AA`) & Dark Teal (`#168F8A`)**: Interactive buttons, active navigation states, selected calendar dates, and featured highlights.
-- **Light Mint (`#EAF7F4`)**: Circular icon containers and pill badges.
-- **White Rounded Cards (`#FFFFFF`)**: 20–28px border-radii with soft elevation shadows.
-- **Clean Typography**: High legibility powered by Plus Jakarta Sans / Poppins.
-- **Minimal Medical Line Icons**: Lucide outline-style icons with zero emoji clutter.
-- **Floating Rounded Bottom Navigation Bar**: Fixed floating bar with circular icon containers for seamless switching between core tabs.
+> **Pure Client-Side Frontend Architecture**: Zero backend dependencies. Runs completely in a single terminal via Vite.
+> **Design System**: Pastel Mint `#D8EFE9`, Vibrant Medical Teal `#20B2AA`, Dark Teal `#168F8A`, Light Mint `#EAF7F4`, White Rounded Cards, Soft Elevation Shadows, Pill Buttons, and Minimal Medical Line Icons.
 
 ---
 
-## 📱 The 11 Connected Application Screens
+## ⚡ Quick Start (Single Terminal)
 
-1. **Dashboard (`#dashboard`) — Flagship Screen**:
-   - Patient greeting for Sarah Carter with avatar and unread notification bell.
-   - Global search for medicines, symptoms, or doctors.
-   - Featured Daily Medication Card in teal gradient with live SVG progress ring (e.g. *2 of 4 doses taken - 50%*).
-   - Today's medication checklist with instant check-off feedback.
-   - Quick-Access Grid (Guidance, AI Doctor, Doctors, Emergency SOS).
-   - Upcoming doctor consultation card with direct teleconsultation join action.
-   - Daily cardiovascular & hydration tip card.
+You only need **ONE** terminal to run the complete MediGuid application. No backend or database required!
 
-2. **Patient Details (`#patient-details`)**:
-   - Header with patient photo, patient ID (`#MG-9482`), blood group `O+`, age 28, gender Female.
-   - Vitals grid: Heart Rate (72 bpm), Blood Pressure (118/76 mmHg), Blood Glucose (95 mg/dL), Blood Oxygen (98% SpO2).
-   - Critical allergy warning card (Penicillin, Sulfa drugs).
-   - Primary care physician and ICE emergency contact details.
-
-3. **Medication Guidance (`#guidance`)**:
-   - Protocol banner with adherence progress.
-   - Schedule grouped by Morning (08:00 AM), Afternoon (01:00 PM), Evening (08:30 PM), and Bedtime (10:30 PM).
-   - Connected vertical timeline with teal node circles.
-   - Detailed medicine cards with dosage, remaining count, before/after food pill badges.
-   - Drug interaction safety checker card with advice on food/grapefruit interactions.
-
-4. **AI Medical Chatbot (`#chat`) — MediBot**:
-   - Clean medical conversation interface with online clinical status.
-   - Quick prompt suggestion pills for instant questions (*Side effects of Metformin*, *Paracetamol + Amoxicillin safety*, *Missed dose protocol*, *Headache symptoms*).
-   - Clinically structured responses with recommendations, cautions, and dosage rules.
-   - Simulated prescription attachment and message dispatch.
-
-5. **Pharmacy & Stock Catalog (`#stock`)**:
-   - Instant search bar and category filter pills (*All Items*, *Antibiotics*, *Chronic Care*, *Pain Relief*, *Vitamins*).
-   - Medicine cards with stock levels (*In Stock* vs *Low Stock (8 left)*), Rx required tags, and prices.
-   - Quantity counter and "Add to Cart" button.
-   - Sticky floating cart indicator with item count, total price, and express checkout drawer.
-
-6. **Doctors Directory (`#doctors`)**:
-   - Featured doctor hero banner in teal gradient with large doctor image and rating badge (*Dr. Evelyn Reed - Cardiologist*).
-   - Specialty filter chips (*Cardiology*, *Neurology*, *General Medicine*, *Pediatrics*).
-   - Doctor cards with circular avatars, specialty, experience, star rating badge, and circular light-mint arrow buttons.
-
-7. **Appointment Booking (`#appointment`)**:
-   - Selected doctor summary card and consultation fee.
-   - Consultation mode selector (*In-Clinic*, *Video Call*, *Audio Call*).
-   - Horizontal scrollable calendar date picker with teal active selector.
-   - Time slot grid (*09:30 AM*, *11:00 AM*, *02:15 PM*, *03:30 PM*, *04:45 PM*, *06:00 PM*).
-   - Patient symptom note textarea and "Confirm Appointment" button triggering an animated confirmation modal.
-
-8. **Doctor Contact & Teleconsultation (`#doctor-contact`)**:
-   - Live video call interface with doctor stream, picture-in-picture patient preview, and live call timer.
-   - Video call controls: Mute/Unmute microphone, Camera on/off, End call.
-   - Direct consultation chat thread for prescription and instruction exchanges.
-
-9. **Emergency SOS (`#emergency`)**:
-   - High-visibility emergency header.
-   - Massive red pulsating SOS button (`#EF5350`) with an animated 3-second countdown modal to prevent accidental activation.
-   - 1-tap emergency dispatch buttons: Call 108 / 911, Alert ICE Contact with live GPS.
-   - Nearby trauma hospitals list with driving times, distance (*0.8 km*), ER status, and direct call buttons.
-   - Emergency Medical ID card.
-
-10. **Orders & Delivery Tracking (`#orders`)**:
-    - Active order tracking card with an animated 4-step delivery progress stepper (*Order Placed → Verified → Packed → Delivering*).
-    - Courier arrival estimate (Marcus on Electric Bike - ETA 18 mins).
-    - Prescribed medicines breakdown and payment summary.
-    - Prescription upload dropzone card.
-
-11. **Profile & Settings (`#profile`)**:
-    - Patient health card with insurance details (*Aetna Premier Health*).
-    - Navigation menu items to health vitals, prescription protocols, and order invoices.
-    - Preferences for pill reminder alarms, biometric security FaceID toggle, and emergency contacts.
-
----
-
-## 🚀 How to Run
-
-### Option 1: Direct File Open
-Simply double-click **`index.html`** in any modern web browser (Google Chrome, Microsoft Edge, Firefox, Safari).
-
-### Option 2: Local Python Server
-Run the included Python server script:
-```powershell
-python server.py
+### Option 1: Modern Frontend Dev Server (Recommended)
+```bash
+npm run dev
 ```
-This starts a local HTTP server at `http://localhost:8000` and automatically opens your default browser.
+Starts the high-speed Vite dev server with instant Hot Module Reloading (HMR) at:
+**`http://localhost:5173`**
+
+### Option 2: Start & Auto-Open Browser
+```bash
+npm start
+```
+Starts the frontend dev server and automatically launches your default browser.
+
+### Option 3: Windows One-Click Launcher
+Double-click **`start.bat`** (or run `.\start.bat` in PowerShell).
+
+### Option 4: Direct Browser Execution
+Open `index.html` directly in any modern web browser.
 
 ---
 
-## 🛠️ Project Structure
+## 🏥 Dual Healthcare Portals & All Application Features
+
+### 1. Dual Portal Selector (Desktop Landing Screen)
+- **Hospital Clinical Portal**: Designed for doctors and clinical staff to manage inpatient admissions, discharge summaries, and ward bed allocations.
+- **Patient Health Companion Portal**: Dedicated personal healthcare portal for patients (Sarah Carter, `#MG-9482`) with medication tracking, teleconsultation, and clinical guidance.
+
+### 2. Hospital Management Portal
+- **Real-Time Ward Overview**: Active patient admissions, bed occupancy, doctor roster, and critical alerts.
+- **Discharge Summary OCR & Document Center**: High-resolution clinical discharge previews with simulated OCR extraction, download, and print capabilities.
+- **Bed Status & Emergency Admission Trackers**: Instant status toggles and patient intake recording.
+
+### 3. Patient Health Companion Portal
+- **Dashboard (`#dashboard`)**: Daily medication adherence circular progress indicator (e.g. *2 of 4 doses taken - 50%*), one-tap dose check-off, upcoming teleconsultation card, and daily cardiovascular tips.
+- **Patient Details (`#patient-details`)**: Patient ID `#MG-9482`, blood group `O+`, vitals telemetry (Heart Rate 72 bpm, BP 118/76 mmHg, SpO2 98%), critical allergies, and primary physician contact.
+- **Medication Schedule & Timeline (`#guidance`)**: Morning (08:00 AM), Afternoon (01:00 PM), Evening (08:30 PM), Bedtime (10:30 PM) schedule with food relationship badges and drug interaction warning alerts.
+- **MediBot AI Clinical Assistant (`#chat`)**: Pure client-side bilingual clinical consultation (English + Tamil + Tanglish). Covers 38 conditions with zero external AI API required.
+- **Voice Assistant (`voice.js`)**: Speech recognition (STT) and clinical speech synthesis (TTS) powered entirely by the browser's Web Speech API.
+- **Pharmacy Catalog & Cart (`#stock`)**: Medicine search, stock status badges, category filters, quantity counter, and sliding checkout drawer.
+- **Doctors Directory (`#doctors`)**: Specialist directory with credentials, star ratings, and instant appointment booking.
+- **Appointment Booking (`#appointment`)**: In-clinic / video call selector, interactive calendar, and time-slot booking.
+- **Doctor Teleconsultation (`#doctor-contact`)**: Simulated video consultation interface with doctor stream, PIP preview, and clinical chat.
+- **Emergency SOS (`#emergency`)**: 3-second safety countdown, direct 108/911 emergency dispatch, and nearby trauma centers list.
+
+---
+
+## 📁 Project Architecture
 
 ```
 mediGuid/
-├── index.html                 # Main SPA entry point containing all 11 screens & modals
-├── css/
-│   ├── design-system.css      # Palette tokens, pastel mint background, typography, soft shadows
-│   ├── components.css         # White cards, pill buttons, circular icons, floating bottom nav
-│   └── screens.css            # Screen layouts (Dashboard, Guidance, Chat, Emergency, etc.)
-├── js/
-│   ├── icons.js               # Embedded clean Lucide medical line SVG icons
-│   ├── data.js                # Clinical datasets (medications, doctors, vitals, stock)
-│   ├── chat.js                # AI Doctor chatbot engine with clinical responses
-│   ├── interactions.js        # Doses toggle, cart checkout, SOS countdown, booking flow
-│   └── app.js                 # Router, screen navigation, bottom bar syncing, initialization
-├── server.py                  # Zero-dependency local development server
-└── README.md                  # Documentation
+├── index.html            # Main SPA entry point (Dual Portals: Hospital & Patient)
+├── style.css             # Root stylesheet
+├── app.js                # Consolidated frontend application script
+├── medicalKnowledge.js   # 38 clinical conditions, bilingual NLP engine
+├── medicalMedicines.js   # 33 verified medications catalog & stock index
+├── voice.js              # Speech recognition & synthesis manager
+├── vite.config.js        # Vite frontend server configuration
+├── package.json          # Frontend scripts (npm run dev, npm start, npm run build)
+├── start.bat             # Single-terminal Windows launcher
+├── css/                  # Stylesheets workspace
+│   ├── style.css         # Complete stylesheet
+│   ├── design-system.css # Color tokens & typography
+│   ├── components.css    # Cards, pills, buttons, navigation
+│   └── screens.css       # Screen layouts & modals
+├── js/                   # Scripts workspace
+│   ├── app.js            # Main application router
+│   ├── chat.js           # MediBot chat engine
+│   ├── data.js           # Clinical mock records
+│   ├── icons.js          # SVG icon library
+│   ├── interactions.js   # Event listeners & dose tracker
+│   ├── medicalKnowledge.js
+│   ├── medicalMedicines.js
+│   └── voice.js
+├── frontend/             # Standalone frontend application package
+│   ├── index.html
+│   ├── style.css
+│   ├── app.js
+│   ├── medicalKnowledge.js
+│   ├── medicalMedicines.js
+│   ├── voice.js
+│   └── package.json
+└── scratch/              # Development testing & validation tools
 ```

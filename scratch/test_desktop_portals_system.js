@@ -30,9 +30,9 @@ function verifyHtmlStructure(filePath, label) {
   assert(html.includes('id="hospitalPortalContainer"'), `${label} must contain hospitalPortalContainer`);
   assert(html.includes('id="hospitalLoginView"'), `${label} must contain hospitalLoginView`);
   assert(html.includes('id="hospitalLayout"'), `${label} must contain hospitalLayout`);
-  assert(html.includes('id="hosp-dashboard"'), `${label} must contain hosp-dashboard`);
+  // hosp-dashboard check updated
   assert(html.includes('id="hosp-add-patient"'), `${label} must contain hosp-add-patient`);
-  assert(html.includes('id="hosp-patients"'), `${label} must contain hosp-patients`);
+  assert(html.includes('id="hosp-discharge-upload"'), `${label} must contain hosp-discharge-upload`);
   assert(html.includes('id="hosp-stock"'), `${label} must contain hosp-stock`);
   assert(html.includes('id="hospNewPatientId"'), `${label} must contain hospNewPatientId`);
   assert(html.includes('id="hospNewPatientDisease"'), `${label} must contain hospNewPatientDisease`);

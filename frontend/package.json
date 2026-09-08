@@ -1,0 +1,16 @@
+{
+  "name": "mediguid-frontend-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MediGuid - Pure Client-Side Frontend Healthcare Platform",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.4.3"
+  }
+}
