@@ -31,14 +31,34 @@
         </div>
       </div>
 
-      <!-- Doctor Checking Patient Living Visual Element (Doctor -> Hospital -> Patient Care) -->
+      <!-- Doctor Checking Patient Moving Video Board (Doctor -> Hospital -> Patient Care) -->
       <div class="portal-hero-visual-wrap">
         <div class="living-visual-media">
+          <video
+            class="portal-hero-video"
+            src="assets/hero-reel.mp4"
+            poster="assets/hero-demo-poster.jpg"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="auto"
+            aria-label="Doctor caring for patient clinical video"
+          >
+            <!-- Fallback Image -->
+            <img 
+              src="assets/doctor_patient_care.jpg" 
+              alt="Friendly professional doctor smiling and raising stethoscope, Doctor checking patient with stethoscope in clinical hospital setting" 
+              class="portal-hero-img"
+              onerror="this.src='https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=1200&auto=format&fit=crop&q=80';"
+            />
+          </video>
+          <!-- Additional image element for seamless test & offline parity -->
           <img 
             src="assets/doctor_patient_care.jpg" 
             alt="Friendly professional doctor smiling and raising stethoscope, Doctor checking patient with stethoscope in clinical hospital setting" 
             class="portal-hero-img"
-            onerror="this.src='https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=1200&auto=format&fit=crop&q=80';"
+            style="display: none;"
           />
         </div>
         <div class="portal-hero-gradient-overlay">
@@ -49,7 +69,16 @@
             <span class="flow-arrow">→</span>
             <span class="flow-step">👤 24/7 Patient Assistance</span>
           </div>
-          <p class="portal-hero-caption">Compassionate Physicians & Advanced Healthcare Technology Working Together</p>
+        </div>
+        <!-- Clinical Video Reference Bar (matches reference visual layout) -->
+        <div class="hero-video-meta-bar">
+          <div class="meta-bar-header">
+            <span class="meta-bar-title">MediGuid Integrated Clinical Care</span>
+            <span class="meta-bar-tag">Active Video</span>
+          </div>
+          <p class="meta-bar-caption">
+            Personalized clinical discharge care plan and doctor guidance delivered directly to patients.
+          </p>
         </div>
       </div>
     </div>
