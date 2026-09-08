@@ -1,6 +1,9 @@
-﻿# MediGuid — Healthcare & Medication Guidance Platform
+# MediGuid — Healthcare & Medication Guidance Platform
 
-> **Pure Client-Side Frontend Architecture**: Zero backend dependencies. Runs completely in a single terminal via Vite.
+🌐 **Live Public Website**: **[https://kemildon.github.io/mediGuid/](https://kemildon.github.io/mediGuid/)**  
+*(Accessible from any device, system, smartphone, or browser globally with zero setup)*
+
+> **Pure Client-Side Frontend Architecture**: Zero backend dependencies. Runs completely in a single terminal via Vite or directly on GitHub Pages.
 > **Design System**: Pastel Mint `#D8EFE9`, Vibrant Medical Teal `#20B2AA`, Dark Teal `#168F8A`, Light Mint `#EAF7F4`, White Rounded Cards, Soft Elevation Shadows, Pill Buttons, and Minimal Medical Line Icons.
 
 ---
