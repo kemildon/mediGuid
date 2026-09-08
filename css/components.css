@@ -1,0 +1,783 @@
+/* ==========================================================================
+   MEDIGUID COMPONENT STYLES
+   White Cards (20-28px radius), Circular Icon Containers, Pill Buttons,
+   Doctor Cards, Medicine Cards, Floating Bottom Nav, Modals & Badges
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CARDS & SURFACES
+   -------------------------------------------------------------------------- */
+.card-white {
+  background: var(--card-white);
+  border-radius: var(--radius-card);
+  padding: 22px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  position: relative;
+  transition: var(--transition-smooth);
+}
+
+.card-white:hover {
+  box-shadow: var(--shadow-float);
+}
+
+.card-white-sm {
+  background: var(--card-white);
+  border-radius: var(--radius-card-sm);
+  padding: 16px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.card-teal-gradient {
+  background: linear-gradient(135deg, var(--primary-teal) 0%, var(--dark-teal) 100%);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  color: var(--card-white);
+  box-shadow: var(--shadow-teal);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-teal-gradient::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-circle);
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+.card-teal-gradient h1,
+.card-teal-gradient h2,
+.card-teal-gradient h3,
+.card-teal-gradient h4,
+.card-teal-gradient p {
+  color: var(--card-white);
+}
+
+.card-emergency {
+  background: linear-gradient(135deg, #EF5350 0%, #D32F2F 100%);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  color: var(--card-white);
+  box-shadow: var(--shadow-emergency);
+  position: relative;
+}
+
+.card-emergency h1,
+.card-emergency h2,
+.card-emergency h3,
+.card-emergency p {
+  color: var(--card-white);
+}
+
+/* --------------------------------------------------------------------------
+   2. CIRCULAR ICON CONTAINERS
+   -------------------------------------------------------------------------- */
+.icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-circle);
+  background: var(--light-mint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dark-teal);
+  flex-shrink: 0;
+  transition: var(--transition-smooth);
+}
+
+.icon-circle svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--dark-teal);
+  stroke-width: 2;
+}
+
+.icon-circle-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-circle);
+  background: var(--light-mint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dark-teal);
+  flex-shrink: 0;
+}
+.icon-circle-sm svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--dark-teal);
+  stroke-width: 2;
+}
+
+.icon-circle-lg {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-circle);
+  background: var(--light-mint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dark-teal);
+  flex-shrink: 0;
+}
+.icon-circle-lg svg {
+  width: 26px;
+  height: 26px;
+  stroke: var(--dark-teal);
+  stroke-width: 2;
+}
+
+.icon-circle-white {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--card-white);
+}
+.icon-circle-white svg {
+  stroke: var(--card-white);
+}
+
+.icon-circle-emergency {
+  background: var(--color-emergency-bg);
+  color: var(--color-emergency);
+}
+.icon-circle-emergency svg {
+  stroke: var(--color-emergency);
+}
+
+/* --------------------------------------------------------------------------
+   3. PILL BUTTONS & CONTROLS
+   -------------------------------------------------------------------------- */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: var(--transition-smooth);
+  user-select: none;
+}
+
+.btn-pill-primary {
+  background: var(--primary-teal);
+  color: var(--card-white);
+  box-shadow: 0 6px 18px rgba(32, 178, 170, 0.32);
+}
+
+.btn-pill-primary:hover {
+  background: var(--dark-teal);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(22, 143, 138, 0.4);
+}
+
+.btn-pill-primary:active {
+  transform: translateY(0);
+}
+
+.btn-pill-secondary {
+  background: var(--card-white);
+  border: 1.8px solid var(--primary-teal);
+  color: var(--dark-teal);
+}
+
+.btn-pill-secondary:hover {
+  background: var(--light-mint);
+  transform: translateY(-1px);
+}
+
+.btn-pill-white {
+  background: var(--card-white);
+  color: var(--dark-teal);
+  box-shadow: 0 4px 14px rgba(16, 42, 67, 0.1);
+}
+.btn-pill-white:hover {
+  background: var(--light-mint);
+  transform: translateY(-1px);
+}
+
+.btn-pill-emergency {
+  background: var(--color-emergency);
+  color: var(--card-white);
+  box-shadow: var(--shadow-emergency);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.btn-pill-emergency:hover {
+  background: var(--color-emergency-dark);
+  transform: translateY(-2px);
+}
+
+.btn-pill-sm {
+  padding: 8px 16px;
+  font-size: 0.82rem;
+}
+
+.btn-pill-lg {
+  padding: 15px 32px;
+  font-size: 1.05rem;
+}
+
+.btn-icon-circular {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-circle);
+  background: var(--light-mint);
+  border: none;
+  color: var(--dark-teal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.btn-icon-circular:hover {
+  background: rgba(32, 178, 170, 0.25);
+  transform: scale(1.05);
+}
+
+/* --------------------------------------------------------------------------
+   4. PILL BADGES & CHIPS
+   -------------------------------------------------------------------------- */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.badge-mint {
+  background: var(--light-mint);
+  color: var(--dark-teal);
+}
+
+.badge-teal {
+  background: var(--primary-teal);
+  color: var(--card-white);
+}
+
+.badge-success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.badge-warning {
+  background: var(--color-warning-bg);
+  color: #B45309;
+}
+
+.badge-emergency {
+  background: var(--color-emergency-bg);
+  color: var(--color-emergency);
+}
+
+.badge-white {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--dark-teal);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   5. DOCTOR CARDS (Strict Visual Spec)
+   -------------------------------------------------------------------------- */
+.doctor-card {
+  background: var(--card-white);
+  border-radius: var(--radius-card);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(32, 178, 170, 0.1);
+  transition: var(--transition-smooth);
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+
+.doctor-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-float);
+  border-color: rgba(32, 178, 170, 0.3);
+}
+
+.doctor-card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.doctor-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-circle);
+  object-fit: cover;
+  border: 2px solid var(--light-mint);
+  box-shadow: 0 4px 10px rgba(16, 42, 67, 0.08);
+  flex-shrink: 0;
+}
+
+.doctor-info h4 {
+  font-size: 1.02rem;
+  color: var(--text-main);
+  margin-bottom: 3px;
+}
+
+.doctor-spec {
+  color: var(--primary-teal);
+  font-size: 0.83rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.doctor-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.rating-star {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 700;
+  color: #D97706;
+}
+
+.doctor-card-arrow {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-circle);
+  background: var(--light-mint);
+  color: var(--dark-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition-smooth);
+}
+
+.doctor-card:hover .doctor-card-arrow {
+  background: var(--primary-teal);
+  color: var(--card-white);
+  transform: translateX(3px);
+}
+
+/* Featured Doctor Card */
+.doctor-card-featured {
+  background: linear-gradient(135deg, var(--primary-teal) 0%, var(--dark-teal) 100%);
+  border-radius: var(--radius-card-lg);
+  padding: 24px;
+  color: var(--card-white);
+  box-shadow: var(--shadow-teal);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.doctor-card-featured .doctor-info h3 {
+  color: var(--card-white);
+  font-size: 1.22rem;
+  margin-bottom: 4px;
+}
+
+.doctor-card-featured .doctor-spec {
+  color: #D4F4ED;
+  font-weight: 500;
+}
+
+.doctor-card-featured .doctor-avatar-lg {
+  width: 76px;
+  height: 76px;
+  border-radius: var(--radius-circle);
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   6. MEDICINE CARDS & TIMELINE
+   -------------------------------------------------------------------------- */
+.med-timeline-group {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.med-timeline-connector {
+  position: absolute;
+  top: 36px;
+  bottom: 0;
+  left: 21px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--primary-teal) 0%, rgba(32, 178, 170, 0.2) 100%);
+  z-index: 1;
+}
+
+.med-card {
+  background: var(--card-white);
+  border-radius: var(--radius-card);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(32, 178, 170, 0.1);
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 2;
+  transition: var(--transition-smooth);
+}
+
+.med-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-float);
+}
+
+.med-card.dose-taken {
+  background: rgba(255, 255, 255, 0.7);
+  opacity: 0.85;
+}
+
+.med-card.dose-taken .med-name {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.med-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.med-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-circle);
+  background: var(--light-mint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dark-teal);
+  flex-shrink: 0;
+}
+
+.med-info h4 {
+  font-size: 1.02rem;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.med-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.med-check-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-circle);
+  border: 2px solid var(--primary-teal);
+  background: var(--card-white);
+  color: var(--primary-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  flex-shrink: 0;
+}
+
+.med-check-btn.checked {
+  background: var(--primary-teal);
+  color: var(--card-white);
+  box-shadow: 0 3px 10px rgba(32, 178, 170, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   7. FLOATING ROUNDED BOTTOM NAVIGATION BAR (Strict Visual Spec)
+   -------------------------------------------------------------------------- */
+.bottom-nav-container {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  right: 18px;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.floating-bottom-nav {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 390px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 34px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: 0 16px 36px rgba(16, 42, 67, 0.12), 0 4px 12px rgba(32, 178, 170, 0.1);
+  border: 1px solid rgba(32, 178, 170, 0.18);
+  transition: var(--transition-smooth);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  position: relative;
+  transition: var(--transition-smooth);
+}
+
+.nav-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-circle);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: var(--transition-smooth);
+}
+
+.nav-icon-circle svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: var(--transition-smooth);
+}
+
+.nav-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  transition: var(--transition-smooth);
+}
+
+/* Active tab style: teal icon & light mint background */
+.nav-item.active-nav .nav-icon-circle {
+  background: var(--light-mint);
+  color: var(--primary-teal);
+  box-shadow: 0 3px 10px rgba(32, 178, 170, 0.2);
+}
+
+.nav-item.active-nav .nav-icon-circle svg {
+  stroke: var(--dark-teal);
+  stroke-width: 2.3;
+}
+
+.nav-item.active-nav .nav-label {
+  color: var(--dark-teal);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   8. INPUTS, SEARCH BARS & FORMS
+   -------------------------------------------------------------------------- */
+.search-input-box {
+  display: flex;
+  align-items: center;
+  background: var(--card-white);
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(32, 178, 170, 0.15);
+  transition: var(--transition-smooth);
+  width: 100%;
+}
+
+.search-input-box:focus-within {
+  border-color: var(--primary-teal);
+  box-shadow: 0 4px 16px rgba(32, 178, 170, 0.2);
+}
+
+.search-input-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.92rem;
+  color: var(--text-main);
+  width: 100%;
+  margin-left: 10px;
+  font-family: inherit;
+}
+
+.search-input-box input::placeholder {
+  color: var(--text-muted);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: var(--radius-card-sm);
+  background: var(--light-mint);
+  border: 1.5px solid transparent;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.92rem;
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  background: var(--card-white);
+  border-color: var(--primary-teal);
+  box-shadow: 0 3px 12px rgba(32, 178, 170, 0.18);
+}
+
+/* --------------------------------------------------------------------------
+   9. MODALS & TOASTS
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(16, 42, 67, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+.modal-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-dialog {
+  background: var(--card-white);
+  border-radius: var(--radius-card-lg);
+  padding: 28px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-float);
+  transform: scale(0.92) translateY(14px);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-backdrop.open .modal-dialog {
+  transform: scale(1) translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.modal-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-circle);
+  background: var(--light-mint);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.modal-close-btn:hover {
+  background: rgba(32, 178, 170, 0.2);
+  color: var(--dark-teal);
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  background: var(--card-white);
+  border-radius: var(--radius-pill);
+  padding: 12px 20px;
+  box-shadow: var(--shadow-float);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
