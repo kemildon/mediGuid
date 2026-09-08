@@ -17,31 +17,40 @@
        FIRST SCREEN: PORTAL SELECTION (Desktop Landing Screen)
        ==================================================================== -->
   <div id="portalSelectionScreen" class="portal-select-container">
-    <div class="portal-select-header">
-      <div class="portal-select-logo-badge">
-        <span data-icon="shield" data-icon-size="34"></span>
-      </div>
-      <h1 class="portal-select-title">SMART HEALTH ASSISTANT</h1>
-      <p class="portal-select-subtitle">MediGuid Integrated Clinical Healthcare Platform</p>
-    </div>
-
-    <!-- Doctor Checking Patient Visual Element (Doctor -> Hospital -> Patient Care) -->
-    <div class="portal-hero-visual-wrap">
-      <img 
-        src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=1200&auto=format&fit=crop&q=80" 
-        alt="Friendly professional doctor smiling and raising stethoscope, Doctor checking patient with stethoscope in clinical hospital setting" 
-        class="portal-hero-img"
-        onerror="this.src='https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=1200&auto=format&fit=crop&q=80';"
-      />
-      <div class="portal-hero-gradient-overlay">
-        <div class="portal-flow-badge">
-          <span class="flow-step">🩺 Friendly Doctor & Patient Care</span>
-          <span class="flow-arrow">→</span>
-          <span class="flow-step">🏥 Hospital Records</span>
-          <span class="flow-arrow">→</span>
-          <span class="flow-step">👤 24/7 Patient Assistance</span>
+    <!-- Hero Section: Left Header/Branding & Right Living Visual Board -->
+    <div class="portal-hero-section">
+      <div class="portal-select-header">
+        <div class="portal-select-logo-badge">
+          <span data-icon="shield" data-icon-size="34"></span>
         </div>
-        <p class="portal-hero-caption">Compassionate Physicians & Advanced Healthcare Technology Working Together</p>
+        <h1 class="portal-select-title">SMART HEALTH ASSISTANT</h1>
+        <p class="portal-select-subtitle">MediGuid Integrated Clinical Healthcare Platform</p>
+        <div class="portal-hero-highlights">
+          <span class="highlight-chip"><span data-icon="checkcircle" data-icon-size="14"></span> Verified Hospital Records</span>
+          <span class="highlight-chip"><span data-icon="checkcircle" data-icon-size="14"></span> 24/7 Patient Guidance</span>
+        </div>
+      </div>
+
+      <!-- Doctor Checking Patient Living Visual Element (Doctor -> Hospital -> Patient Care) -->
+      <div class="portal-hero-visual-wrap">
+        <div class="living-visual-media">
+          <img 
+            src="assets/doctor_patient_care.jpg" 
+            alt="Friendly professional doctor smiling and raising stethoscope, Doctor checking patient with stethoscope in clinical hospital setting" 
+            class="portal-hero-img"
+            onerror="this.src='https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=1200&auto=format&fit=crop&q=80';"
+          />
+        </div>
+        <div class="portal-hero-gradient-overlay">
+          <div class="portal-flow-badge">
+            <span class="flow-step">🩺 Friendly Doctor & Patient Care</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">🏥 Hospital Records</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">👤 24/7 Patient Assistance</span>
+          </div>
+          <p class="portal-hero-caption">Compassionate Physicians & Advanced Healthcare Technology Working Together</p>
+        </div>
       </div>
     </div>
 
@@ -1658,7 +1667,7 @@
 
             <!-- Chat Messages Flow -->
             <div id="chatMessagesArea" class="chat-messages-area">
-              <!-- Dynamically populated via js/chat.js -->
+              <!-- Dynamically populated via app.js -->
             </div>
 
             <!-- Quick Prompt Suggestion Pills -->

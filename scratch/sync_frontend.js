@@ -13,7 +13,20 @@ const screensCss = fs.readFileSync(path.join(rootDir, 'css', 'screens.css'), 'ut
 
 const combinedCss = `/* MediGuid Unified Desktop Stylesheet */\n\n${designSystemCss}\n\n${componentsCss}\n\n${screensCss}\n`;
 fs.writeFileSync(path.join(frontendDir, 'style.css'), combinedCss, 'utf8');
-console.log('✓ frontend/style.css updated successfully.');
+fs.writeFileSync(path.join(rootDir, 'style.css'), combinedCss, 'utf8');
+fs.writeFileSync(path.join(rootDir, 'css', 'style.css'), combinedCss, 'utf8');
+console.log('✓ frontend/style.css and root style.css updated successfully.');
+
+// Copy assets if directory exists
+const assetsDir = path.join(rootDir, 'assets');
+const feAssetsDir = path.join(frontendDir, 'assets');
+if (fs.existsSync(assetsDir)) {
+  if (!fs.existsSync(feAssetsDir)) fs.mkdirSync(feAssetsDir, { recursive: true });
+  fs.readdirSync(assetsDir).forEach(f => {
+    fs.copyFileSync(path.join(assetsDir, f), path.join(feAssetsDir, f));
+  });
+  console.log('✓ assets synchronized to frontend/assets/.');
+}
 
 // 2. Build frontend/app.js from js/icons.js + js/data.js + js/chat.js + js/interactions.js + js/app.js
 const iconsJs = fs.readFileSync(path.join(rootDir, 'js', 'icons.js'), 'utf8');

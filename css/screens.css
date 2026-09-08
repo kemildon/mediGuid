@@ -2748,41 +2748,110 @@
 }
 
 /* ==========================================================================
-   PORTAL SELECTION HEALTHCARE HERO VISUAL
+   PORTAL SELECTION HEALTHCARE HERO SECTION & LIVING VISUAL BOARD
    Communicates: Doctor -> Hospital -> Patient Care
    ========================================================================== */
-.portal-hero-visual-wrap {
+.portal-hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 36px;
+  max-width: 1040px;
   width: 100%;
-  max-width: 820px;
-  margin: 0 auto 32px;
+  margin: 0 auto 36px;
+}
+
+.portal-hero-section .portal-select-header {
+  flex: 0 0 380px;
+  max-width: 400px;
+  text-align: left;
+  margin-bottom: 0;
+}
+
+.portal-hero-section .portal-select-logo-badge {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.portal-hero-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.highlight-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.80rem;
+  font-weight: 700;
+  color: var(--dark-teal, #0D6964);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(32, 178, 170, 0.35);
+  padding: 5px 14px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(13, 105, 100, 0.08);
+}
+
+.portal-hero-visual-wrap {
+  flex: 1;
+  max-width: 620px;
+  width: 100%;
+  margin: 0;
   position: relative;
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 16px 36px rgba(16, 42, 67, 0.12);
+  box-shadow: 0 20px 42px rgba(16, 42, 67, 0.16);
   border: 3px solid #FFFFFF;
+  background: #0E3533;
+}
+
+.living-visual-media {
+  width: 100%;
+  height: 310px;
+  overflow: hidden;
+  position: relative;
 }
 
 .portal-hero-img {
   width: 100%;
-  height: 250px;
+  height: 100%;
   object-fit: cover;
+  object-position: center 25%;
   display: block;
-  transition: transform 0.4s ease;
+  transform-origin: center center;
+  transition: transform 0.6s ease;
+  animation: subtleLivingZoom 20s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes subtleLivingZoom {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.04) translate(-1%, -0.5%);
+  }
+  100% {
+    transform: scale(1.02) translate(0.5%, 0.5%);
+  }
 }
 
 .portal-hero-visual-wrap:hover .portal-hero-img {
-  transform: scale(1.02);
+  animation-play-state: paused;
 }
 
 .portal-hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(16, 42, 67, 0.08) 0%, rgba(13, 105, 100, 0.88) 100%);
+  background: linear-gradient(180deg, rgba(16, 42, 67, 0.05) 0%, rgba(13, 105, 100, 0.88) 100%);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   padding: 20px 24px;
   color: #FFFFFF;
+  pointer-events: none;
 }
 
 .portal-flow-badge {
@@ -2799,6 +2868,7 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   width: fit-content;
   margin-bottom: 6px;
+  pointer-events: auto;
 }
 
 .portal-flow-badge .flow-arrow {
@@ -2812,6 +2882,56 @@
   margin: 0;
   font-weight: 500;
   text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+/* Responsive queries for hero section */
+@media (max-width: 991px) {
+  .portal-hero-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    max-width: 100%;
+    margin-bottom: 28px;
+  }
+
+  .portal-hero-section .portal-select-header {
+    flex: none;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .portal-hero-section .portal-select-logo-badge {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .portal-hero-highlights {
+    justify-content: center;
+  }
+
+  .portal-hero-visual-wrap {
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .living-visual-media {
+    height: 270px;
+  }
+}
+
+@media (max-width: 600px) {
+  .living-visual-media {
+    height: 210px;
+  }
+  .portal-flow-badge {
+    font-size: 0.74rem;
+    padding: 6px 12px;
+    gap: 6px;
+  }
+  .portal-flow-badge .flow-step {
+    font-size: 0.74rem;
+  }
 }
 
 /* ==========================================================================
