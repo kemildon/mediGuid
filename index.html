@@ -20,116 +20,274 @@
        FIRST SCREEN: PORTAL SELECTION (Desktop Landing Screen)
        ==================================================================== -->
   <div id="portalSelectionScreen" class="portal-select-container">
-    <!-- Hero Section: Left Header/Branding & Right Living Visual Board -->
-    <div class="portal-hero-section">
-      <div class="portal-select-header">
-        <div class="portal-select-logo-badge">
-          <span data-icon="shield" data-icon-size="34"></span>
-        </div>
-        <h1 class="portal-select-title">SMART HEALTH ASSISTANT</h1>
-        <p class="portal-select-subtitle">MediGuid Integrated Clinical Healthcare Platform</p>
-        <div class="portal-hero-highlights">
-          <span class="highlight-chip"><span data-icon="checkcircle" data-icon-size="14"></span> Verified Hospital Records</span>
-          <span class="highlight-chip"><span data-icon="checkcircle" data-icon-size="14"></span> 24/7 Patient Guidance</span>
-        </div>
+    <!-- 1. Header / Headline & Branding -->
+    <div class="portal-select-header portal-header-centered">
+      <div class="portal-select-logo-badge">
+        <span data-icon="shield" data-icon-size="32"></span>
       </div>
-
-      <!-- Doctor Checking Patient Moving Video Board (Doctor -> Hospital -> Patient Care) -->
-      <div class="portal-hero-visual-wrap">
-        <div class="living-visual-media">
-          <video
-            class="portal-hero-video"
-            src="assets/hero-reel.mp4"
-            poster="assets/hero-demo-poster.jpg"
-            autoplay
-            muted
-            loop
-            playsinline
-            preload="auto"
-            aria-label="Doctor caring for patient clinical video"
-          >
-            <!-- Fallback Image -->
-            <img 
-              src="assets/doctor_patient_care.jpg" 
-              alt="Friendly professional doctor smiling and raising stethoscope, Doctor checking patient with stethoscope in clinical hospital setting" 
-              class="portal-hero-img"
-              onerror="this.src='https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=1200&auto=format&fit=crop&q=80';"
-            />
-          </video>
-          <!-- Additional image element for seamless test & offline parity -->
-          <img 
-            src="assets/doctor_patient_care.jpg" 
-            alt="Friendly professional doctor smiling and raising stethoscope, Doctor checking patient with stethoscope in clinical hospital setting" 
-            class="portal-hero-img"
-            style="display: none;"
-          />
-        </div>
-        <div class="portal-hero-gradient-overlay">
-          <div class="portal-flow-badge">
-            <span class="flow-step">🩺 Friendly Doctor & Patient Care</span>
-            <span class="flow-arrow">→</span>
-            <span class="flow-step">🏥 Hospital Records</span>
-            <span class="flow-arrow">→</span>
-            <span class="flow-step">👤 24/7 Patient Assistance</span>
-          </div>
-        </div>
-        <!-- Clinical Video Reference Bar (matches reference visual layout) -->
-        <div class="hero-video-meta-bar">
-          <div class="meta-bar-header">
-            <span class="meta-bar-title">MediGuid Integrated Clinical Care</span>
-            <span class="meta-bar-tag">Active Video</span>
-          </div>
-          <p class="meta-bar-caption">
-            Personalized clinical discharge care plan and doctor guidance delivered directly to patients.
-          </p>
-        </div>
+      <h1 class="portal-select-title">SMART HEALTH ASSISTANT</h1>
+      <p class="portal-select-subtitle">AI-Powered Hospital Records & 24/7 Patient Guidance</p>
+      <div class="portal-hero-highlights">
+        <span class="highlight-chip"><span data-icon="checkcircle" data-icon-size="14"></span> Verified Hospital Records</span>
+        <span class="highlight-chip"><span data-icon="checkcircle" data-icon-size="14"></span> AI Clinical Synthesis</span>
+        <span class="highlight-chip"><span data-icon="checkcircle" data-icon-size="14"></span> 24/7 Patient Guidance</span>
       </div>
     </div>
 
-    <!-- Two Clearly Separated Portals Grid -->
-    <div class="portal-cards-grid">
-      <!-- Portal 1: Hospital Portal Card -->
-      <div class="portal-card hospital-card" onclick="selectPortal('hospital')">
-        <div class="portal-card-badge">Hospital Management</div>
-        <div class="portal-card-icon-wrap">
-          <span data-icon="building" data-icon-size="44"></span>
+    <!-- 2. Main Visual Feature: Large Original AI Healthcare Transformation Stage (60-75% Hero Area) -->
+    <div class="portal-hero-visual-wrap ai-pipeline-stage" id="landingAiPipelineStage">
+      <!-- Ambient Visual Background Glow & Pattern -->
+      <div class="ai-stage-ambient-glow"></div>
+      <div class="ai-stage-grid-pattern"></div>
+
+      <!-- Stage Header / Storyline Concept Badge -->
+      <div class="ai-stage-header">
+        <div class="portal-flow-badge">
+          <span class="flow-step">🩺 Friendly Doctor & Patient Care</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">🏥 Hospital Records & AI</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">👤 24/7 Patient Care</span>
         </div>
-        <h2 class="portal-card-title">Hospital Portal</h2>
-        <p class="portal-card-role">Doctors, Reception, Clinical Staff & Central Pharmacy</p>
-        <p class="portal-card-desc">
-          Enter and manage patient clinical records, record disease & symptoms, assign attending physicians, and toggle central pharmacy medicine stock.
-        </p>
-        <ul class="portal-card-features">
-          <li><span data-icon="checkcircle" data-icon-size="16"></span> Register patients with condition, symptoms & doctor</li>
-          <li><span data-icon="checkcircle" data-icon-size="16"></span> Real-time central pharmacy medicine stock manager</li>
-          <li><span data-icon="checkcircle" data-icon-size="16"></span> Direct Patient Portal access shortcut on registration</li>
-        </ul>
-        <button class="btn-portal-enter" type="button">
-          <span>Enter Hospital Portal</span>
-          <span data-icon="arrow-left" data-icon-size="18" style="transform: rotate(180deg);"></span>
+        <div class="ai-live-badge">
+          <span class="ai-pulse-dot"></span>
+          <span>Live Neural Medical Engine</span>
+        </div>
+      </div>
+
+      <!-- 3-Pillar Living Storyline Canvas: Medical Info -> AI Understanding -> Patient-Friendly Info -->
+      <div class="ai-pipeline-grid">
+
+        <!-- Pillar 1: Hospital Medical Record / Information -->
+        <div class="ai-pillar-card pillar-clinical active" id="pillarClinical" onclick="setLandingAiStep(0)">
+          <div class="pillar-card-header">
+            <div class="pillar-icon-wrap clinical-icon">
+              <span data-icon="file-text" data-icon-size="18"></span>
+            </div>
+            <div>
+              <span class="pillar-step-num">Step 01</span>
+              <h3 class="pillar-title">Clinical Medical Record</h3>
+            </div>
+          </div>
+
+          <div class="clinical-doc-preview">
+            <div class="doc-header-strip">
+              <span class="doc-badge-verified">Hospital Verified</span>
+              <span class="doc-id">PAT1001</span>
+            </div>
+            <div class="doc-field-row">
+              <span class="doc-field-lbl">Diagnosis:</span>
+              <span class="doc-field-val">Acute Pyrexia & Cephalea</span>
+            </div>
+            <div class="doc-field-row">
+              <span class="doc-field-lbl">Symptoms:</span>
+              <span class="doc-field-val">Fever 101.4°F, persistent headache</span>
+            </div>
+            <!-- ECG Waveform Animation -->
+            <div class="clinical-waveform-box">
+              <svg viewBox="0 0 200 36" class="waveform-svg">
+                <path d="M0,18 L30,18 L40,18 L45,4 L52,32 L60,10 L68,22 L75,18 L120,18 L125,4 L132,32 L140,10 L148,22 L155,18 L200,18" class="waveform-line"/>
+              </svg>
+              <span class="waveform-tag">Vitals: Stable (HR 76 bpm)</span>
+            </div>
+            <!-- Sweeping Laser Scan Line -->
+            <div class="doc-scanner-sweep"></div>
+          </div>
+
+          <div class="pillar-footer-status">
+            <span class="status-indicator-dot dot-cyan"></span>
+            <span>Unstructured clinical data detected</span>
+          </div>
+        </div>
+
+        <!-- Connecting SVG Dynamic Stream 1 -->
+        <div class="ai-connector-stream">
+          <svg viewBox="0 0 60 40" class="connector-svg">
+            <path d="M0,20 C20,20 40,20 60,20" class="connector-path-bg"/>
+            <path d="M0,20 C20,20 40,20 60,20" class="connector-path-flow flow-1"/>
+          </svg>
+          <div class="stream-particle stream-p1"></div>
+        </div>
+
+        <!-- Pillar 2: AI Understanding & Synthesis Core -->
+        <div class="ai-pillar-card pillar-neural active" id="pillarNeural" onclick="setLandingAiStep(1)">
+          <div class="pillar-card-header">
+            <div class="pillar-icon-wrap neural-icon">
+              <span data-icon="bot" data-icon-size="18"></span>
+            </div>
+            <div>
+              <span class="pillar-step-num">Step 02</span>
+              <h3 class="pillar-title">AI Clinical Understanding</h3>
+            </div>
+          </div>
+
+          <!-- Central Neural Synapse Visual -->
+          <div class="neural-core-display">
+            <div class="neural-core-center">
+              <span data-icon="sparkles" data-icon-size="24" style="color: #20B2AA;"></span>
+              <div class="neural-core-ring ring-1"></div>
+              <div class="neural-core-ring ring-2"></div>
+            </div>
+            <div class="neural-nodes-cluster">
+              <div class="neural-node node-1"><span>Entities</span></div>
+              <div class="neural-node node-2"><span>Safety</span></div>
+              <div class="neural-node node-3"><span>Bilingual</span></div>
+            </div>
+          </div>
+
+          <!-- Dynamic Live Processing Status -->
+          <div class="ai-processing-pill">
+            <span class="processing-glow-dot"></span>
+            <span id="aiDynamicStatusText">Synthesizing Patient-Friendly Guidance...</span>
+          </div>
+
+          <div class="pillar-footer-status">
+            <span class="status-indicator-dot dot-teal"></span>
+            <span>38-Condition KB & Dosage Validator</span>
+          </div>
+        </div>
+
+        <!-- Connecting SVG Dynamic Stream 2 -->
+        <div class="ai-connector-stream">
+          <svg viewBox="0 0 60 40" class="connector-svg">
+            <path d="M0,20 C20,20 40,20 60,20" class="connector-path-bg"/>
+            <path d="M0,20 C20,20 40,20 60,20" class="connector-path-flow flow-2"/>
+          </svg>
+          <div class="stream-particle stream-p2"></div>
+        </div>
+
+        <!-- Pillar 3: Patient-Friendly Information & Guidance -->
+        <div class="ai-pillar-card pillar-patient active" id="pillarPatient" onclick="setLandingAiStep(2)">
+          <div class="pillar-card-header">
+            <div class="pillar-icon-wrap patient-icon">
+              <span data-icon="heart" data-icon-size="18"></span>
+            </div>
+            <div>
+              <span class="pillar-step-num">Step 03</span>
+              <h3 class="pillar-title">Patient-Friendly Clarity</h3>
+            </div>
+          </div>
+
+          <div class="patient-clarity-preview">
+            <div class="clarity-title-row">
+              <span class="clarity-icon">💊</span>
+              <div>
+                <strong>Fever & Headache Relief</strong>
+                <div class="clarity-sub">Paracetamol 650mg • 1 tablet after food</div>
+              </div>
+            </div>
+
+            <!-- Actionable Patient Chips -->
+            <div class="clarity-chips-grid">
+              <div class="clarity-chip">
+                <span data-icon="clock" data-icon-size="12"></span>
+                <span>Next dose: 02:00 PM</span>
+              </div>
+              <div class="clarity-chip">
+                <span data-icon="checkcircle" data-icon-size="12"></span>
+                <span>Drink 250ml warm water</span>
+              </div>
+            </div>
+
+            <!-- Doctor Attending Verified Badge (Includes required test image attributes) -->
+            <div class="clarity-doctor-badge">
+              <img 
+                src="assets/doctor_patient_care.jpg" 
+                alt="Friendly professional doctor smiling and raising stethoscope, Doctor checking patient with stethoscope in clinical hospital setting" 
+                class="portal-hero-img"
+                onerror="this.src='https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80';"
+              />
+              <div class="doctor-badge-info">
+                <span class="doctor-name">Dr. Kumar (Attending Physician)</span>
+                <span class="doctor-spec">General Clinical Medicine • Verified</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-footer-status">
+            <span class="status-indicator-dot dot-green"></span>
+            <span>Simplified guidance ready in English & Tamil</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Interactive Stepper Controls -->
+      <div class="ai-stage-controls">
+        <button type="button" class="stage-step-btn active" id="stepBtn0" onclick="setLandingAiStep(0)">
+          <span class="step-btn-num">1</span>
+          <span>Hospital EHR Record</span>
+        </button>
+        <button type="button" class="stage-step-btn" id="stepBtn1" onclick="setLandingAiStep(1)">
+          <span class="step-btn-num">2</span>
+          <span>AI Neural Synthesis</span>
+        </button>
+        <button type="button" class="stage-step-btn" id="stepBtn2" onclick="setLandingAiStep(2)">
+          <span class="step-btn-num">3</span>
+          <span>Patient-Friendly Guidance</span>
         </button>
       </div>
 
-      <!-- Portal 2: Patient Portal Card -->
-      <div class="portal-card patient-card" onclick="selectPortal('patient')">
-        <div class="portal-card-badge">Patient Access</div>
-        <div class="portal-card-icon-wrap">
-          <span data-icon="heart" data-icon-size="44"></span>
+      <!-- Preserved Meta Bar for test & consistency -->
+      <div class="hero-video-meta-bar">
+        <div class="meta-bar-header">
+          <span class="meta-bar-title">MediGuid Integrated Clinical Care</span>
+          <span class="meta-bar-tag">AI Pipeline Active</span>
         </div>
-        <h2 class="portal-card-title">Patient Portal</h2>
-        <p class="portal-card-role">Hospital Patient Access & 24/7 Smart Health Assistant</p>
-        <p class="portal-card-desc">
-          Sign in with your hospital credentials to view your hospital record, 4 summary cards, bilingual AI chatbot, 33-medicine visual catalog, and emergency triage.
+        <p class="meta-bar-caption">
+          Transforming complex hospital discharge records into safe, transparent, and patient-friendly daily healthcare guidance.
         </p>
-        <ul class="portal-card-features">
-          <li><span data-icon="checkcircle" data-icon-size="16"></span> Hospital record: ID, Condition, Symptoms & Doctor</li>
-          <li><span data-icon="checkcircle" data-icon-size="16"></span> Bilingual AI Assistant with concise guidance & more details</li>
-          <li><span data-icon="checkcircle" data-icon-size="16"></span> 33-medicine visual catalog, scanner & emergency SOS</li>
-        </ul>
-        <button class="btn-portal-enter" type="button">
-          <span>Enter Patient Portal</span>
-          <span data-icon="arrow-left" data-icon-size="18" style="transform: rotate(180deg);"></span>
-        </button>
+      </div>
+    </div>
+
+    <!-- 3. Compact & Elegant Portal Entry Points (Supporting, Not Dominating) -->
+    <div class="portal-cards-grid portal-cards-compact">
+      <!-- Portal 1: Hospital Management Entry Point -->
+      <div class="portal-card hospital-card" onclick="selectPortal('hospital')" role="button" tabindex="0">
+        <div class="compact-card-left">
+          <div class="portal-card-icon-wrap compact-icon-wrap">
+            <span data-icon="building" data-icon-size="24"></span>
+          </div>
+        </div>
+        <div class="compact-card-body">
+          <div class="compact-card-meta">
+            <span class="compact-card-badge">Staff & Clinical Station</span>
+          </div>
+          <h2 class="portal-card-title compact-card-title">Hospital Portal</h2>
+          <p class="portal-card-desc compact-card-desc">
+            Register patients with symptoms, upload discharge summaries & manage central pharmacy availability.
+          </p>
+        </div>
+        <div class="compact-card-action">
+          <button class="btn-portal-enter compact-btn-enter" type="button">
+            <span>Enter Hospital</span>
+            <span data-icon="arrow-left" data-icon-size="15" style="transform: rotate(180deg);"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Portal 2: Patient Health Assistant Entry Point -->
+      <div class="portal-card patient-card" onclick="selectPortal('patient')" role="button" tabindex="0">
+        <div class="compact-card-left">
+          <div class="portal-card-icon-wrap compact-icon-wrap">
+            <span data-icon="heart" data-icon-size="24"></span>
+          </div>
+        </div>
+        <div class="compact-card-body">
+          <div class="compact-card-meta">
+            <span class="compact-card-badge">Patient & Family Access</span>
+          </div>
+          <h2 class="portal-card-title compact-card-title">Patient Portal</h2>
+          <p class="portal-card-desc compact-card-desc">
+            View verified hospital records, dosage schedules, bilingual AI health assistant & medicine catalog.
+          </p>
+        </div>
+        <div class="compact-card-action">
+          <button class="btn-portal-enter compact-btn-enter" type="button">
+            <span>Enter Patient</span>
+            <span data-icon="arrow-left" data-icon-size="15" style="transform: rotate(180deg);"></span>
+          </button>
+        </div>
       </div>
     </div>
 

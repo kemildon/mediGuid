@@ -678,6 +678,88 @@ if (typeof window !== 'undefined') {
 }
 
 // --------------------------------------------------------------------------
+// ORIGINAL AI HEALTHCARE PIPELINE ANIMATION CONTROLLER
+// Concept: "Medical Information -> AI Understanding -> Patient-Friendly Info"
+// --------------------------------------------------------------------------
+let currentAiStageStep = 0;
+let aiStageCycleInterval = null;
+
+const AI_STAGE_STATUS_MESSAGES = [
+  "Scanning Clinical EHR Record (PAT1001)...",
+  "Extracting Clinical Entities & Checking Dosages...",
+  "Synthesizing Patient-Friendly Guidance in English & Tamil..."
+];
+
+function setLandingAiStep(stepIndex) {
+  currentAiStageStep = stepIndex % 3;
+  const pillars = [
+    document.getElementById('pillarClinical'),
+    document.getElementById('pillarNeural'),
+    document.getElementById('pillarPatient')
+  ];
+  const buttons = [
+    document.getElementById('stepBtn0'),
+    document.getElementById('stepBtn1'),
+    document.getElementById('stepBtn2')
+  ];
+
+  pillars.forEach((p, idx) => {
+    if (p) {
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        if (idx === currentAiStageStep) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      } else {
+        p.classList.add('active');
+        if (idx === currentAiStageStep) {
+          p.style.borderColor = 'var(--primary-teal)';
+          p.style.transform = 'translateY(-3px)';
+        } else {
+          p.style.borderColor = 'rgba(216, 239, 233, 0.16)';
+          p.style.transform = 'none';
+        }
+      }
+    }
+  });
+
+  buttons.forEach((b, idx) => {
+    if (b) b.classList.toggle('active', idx === currentAiStageStep);
+  });
+
+  const statusEl = document.getElementById('aiDynamicStatusText');
+  if (statusEl && AI_STAGE_STATUS_MESSAGES[currentAiStageStep]) {
+    statusEl.textContent = AI_STAGE_STATUS_MESSAGES[currentAiStageStep];
+  }
+}
+
+function initLandingAiAnimation() {
+  if (typeof window === 'undefined') return;
+  if (aiStageCycleInterval) clearInterval(aiStageCycleInterval);
+
+  setLandingAiStep(0);
+
+  aiStageCycleInterval = setInterval(() => {
+    const portalScreen = document.getElementById('portalSelectionScreen');
+    if (portalScreen && portalScreen.style.display !== 'none') {
+      currentAiStageStep = (currentAiStageStep + 1) % 3;
+      setLandingAiStep(currentAiStageStep);
+    }
+  }, 3600);
+}
+
+if (typeof window !== 'undefined') {
+  window.setLandingAiStep = setLandingAiStep;
+  window.initLandingAiAnimation = initLandingAiAnimation;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLandingAiAnimation);
+  } else {
+    setTimeout(initLandingAiAnimation, 50);
+  }
+}
+
+// --------------------------------------------------------------------------
 // 4. DUAL-PORTAL SWITCHER & AUTHENTICATION MANAGEMENT
 // --------------------------------------------------------------------------
 
@@ -694,6 +776,7 @@ function selectPortal(portalType) {
     if (hospContainer) hospContainer.style.display = 'none';
     if (patContainer) patContainer.style.display = 'none';
     localStorage.setItem('activePortal', 'select');
+    if (typeof initLandingAiAnimation === 'function') initLandingAiAnimation();
     return;
   }
 
