@@ -640,12 +640,51 @@ function confirmAppointmentBooking() {
 }
 
 // --------------------------------------------------------------------------
+// MOBILE SIDEBAR / OFF-CANVAS RESPONSIVE NAVIGATION CONTROLLER
+// --------------------------------------------------------------------------
+function toggleMobileSidebar(portalType) {
+  const sidebar = portalType === 'hospital'
+    ? document.getElementById('hospitalSidebar')
+    : document.getElementById('patientSidebar');
+  const backdrop = document.getElementById('mobileSidebarBackdrop');
+
+  if (!sidebar) return;
+  const isOpen = sidebar.classList.contains('mobile-open');
+  if (isOpen) {
+    closeMobileSidebar();
+  } else {
+    document.querySelectorAll('.desktop-sidebar').forEach(sb => sb.classList.remove('mobile-open'));
+    sidebar.classList.add('mobile-open');
+    if (backdrop) backdrop.classList.add('active');
+    if (document.body) document.body.classList.add('mobile-sidebar-locked');
+  }
+}
+
+function closeMobileSidebar() {
+  document.querySelectorAll('.desktop-sidebar').forEach(sb => sb.classList.remove('mobile-open'));
+  const backdrop = document.getElementById('mobileSidebarBackdrop');
+  if (backdrop) backdrop.classList.remove('active');
+  if (document.body) document.body.classList.remove('mobile-sidebar-locked');
+}
+
+if (typeof window !== 'undefined') {
+  window.toggleMobileSidebar = toggleMobileSidebar;
+  window.closeMobileSidebar = closeMobileSidebar;
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 1024) {
+      closeMobileSidebar();
+    }
+  });
+}
+
+// --------------------------------------------------------------------------
 // 4. DUAL-PORTAL SWITCHER & AUTHENTICATION MANAGEMENT
 // --------------------------------------------------------------------------
 
 let currentHospStockCat = 'All';
 
 function selectPortal(portalType) {
+  closeMobileSidebar();
   const selectScreen = document.getElementById('portalSelectionScreen');
   const hospContainer = document.getElementById('hospitalPortalContainer');
   const patContainer = document.getElementById('patientPortalContainer');
@@ -753,6 +792,7 @@ function handleHospitalLogout() {
 let lastRegisteredPatientId = null;
 
 function hospNavigateTo(screenId) {
+  closeMobileSidebar();
   const screens = document.querySelectorAll('.hosp-screen');
   screens.forEach(s => s.style.display = 'none');
 
@@ -1872,6 +1912,7 @@ function openForgotPasswordModal() {
 }
 
 function patientNavigateTo(screenId) {
+  closeMobileSidebar();
   const screens = document.querySelectorAll('.patient-screen');
   screens.forEach(s => s.style.display = 'none');
 

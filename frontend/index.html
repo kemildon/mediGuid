@@ -13,6 +13,9 @@
 
 <div class="desktop-viewport-wrapper">
 
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div id="mobileSidebarBackdrop" class="mobile-sidebar-backdrop" onclick="closeMobileSidebar()"></div>
+
   <!-- ====================================================================
        FIRST SCREEN: PORTAL SELECTION (Desktop Landing Screen)
        ==================================================================== -->
@@ -131,7 +134,7 @@
     </div>
 
     <!-- Quick Demo Access Bar -->
-    <div style="margin-top: 36px; padding: 14px 24px; background: #FFFFFF; border-radius: 16px; border: 1px solid rgba(216, 239, 233, 0.8); display: flex; align-items: center; justify-content: center; gap: 20px; font-size: 0.84rem; flex-wrap: wrap;">
+    <div class="portal-quick-demo" style="margin-top: 36px; padding: 14px 24px; background: #FFFFFF; border-radius: 16px; border: 1px solid rgba(216, 239, 233, 0.8); display: flex; align-items: center; justify-content: center; gap: 20px; font-size: 0.84rem; flex-wrap: wrap;">
       <span style="font-weight: 700; color: var(--text-main);">Quick Evaluation Access:</span>
       <button class="btn-pill btn-pill-secondary btn-pill-sm" onclick="selectPortal('hospital'); fillDemoHospitalLogin();">
         <span data-icon="building" data-icon-size="14"></span> Staff Demo (Admin / admin123)
@@ -212,7 +215,8 @@
     <!-- Sub-View 1B: Hospital Desktop App Layout -->
     <div id="hospitalLayout" class="desktop-app-layout" style="display: none;">
       <!-- Hospital Fixed Sidebar -->
-      <aside class="desktop-sidebar">
+      <aside id="hospitalSidebar" class="desktop-sidebar">
+        <button type="button" class="sidebar-mobile-close-btn" onclick="closeMobileSidebar()" aria-label="Close Hospital Navigation">✕</button>
         <div>
           <div class="sidebar-brand">
             <div class="sidebar-brand-icon">
@@ -267,10 +271,15 @@
       <main class="desktop-main-viewport">
         <!-- Hospital Top Navbar -->
         <header class="desktop-top-navbar">
-          <div class="desktop-nav-title">
-            <h2>Hospital Clinical & Pharmacy Station</h2>
-            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-              MediGuid City General Hospital • Central Administration
+          <div class="desktop-nav-brand-wrap">
+            <button id="hospMobileMenuToggle" type="button" class="mobile-menu-toggle-btn" onclick="toggleMobileSidebar('hospital')" aria-label="Open Hospital Navigation">
+              <span data-icon="menu" data-icon-size="20"></span>
+            </button>
+            <div class="desktop-nav-title">
+              <h2>Hospital Clinical & Pharmacy Station</h2>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                MediGuid City General Hospital • Central Administration
+              </div>
             </div>
           </div>
 
@@ -924,7 +933,8 @@
     <!-- Sub-View 2B: Patient Desktop App Layout -->
     <div id="patientLayout" class="desktop-app-layout" style="display: none;">
       <!-- Patient Fixed Sidebar -->
-      <aside class="desktop-sidebar">
+      <aside id="patientSidebar" class="desktop-sidebar">
+        <button type="button" class="sidebar-mobile-close-btn" onclick="closeMobileSidebar()" aria-label="Close Patient Navigation">✕</button>
         <div>
           <div class="sidebar-brand">
             <div class="sidebar-brand-icon">
@@ -997,15 +1007,20 @@
       <main class="desktop-main-viewport">
         <!-- Patient Top Navbar -->
         <header class="desktop-top-navbar">
-          <div class="desktop-nav-title">
-            <h2>Patient Health Assistant</h2>
-            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-              Connected to Hospital System • Patient ID: <span id="navBarPatientId" style="font-weight: 700; color: var(--dark-teal);">PAT1001</span>
+          <div class="desktop-nav-brand-wrap">
+            <button id="patientMobileMenuToggle" type="button" class="mobile-menu-toggle-btn" onclick="toggleMobileSidebar('patient')" aria-label="Open Patient Navigation">
+              <span data-icon="menu" data-icon-size="20"></span>
+            </button>
+            <div class="desktop-nav-title">
+              <h2>Patient Health Assistant</h2>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                Connected to Hospital System • Patient ID: <span id="navBarPatientId" style="font-weight: 700; color: var(--dark-teal);">PAT1001</span>
+              </div>
             </div>
           </div>
 
           <div class="desktop-nav-actions">
-            <div class="search-input-box" style="width: 260px;">
+            <div class="search-input-box nav-search-box" style="width: 260px;">
               <span data-icon="search" data-icon-size="16" style="color: var(--primary-teal);"></span>
               <input type="text" id="dashSearchInput" placeholder="Search medicines, symptoms..."/>
             </div>

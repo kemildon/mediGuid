@@ -3672,4 +3672,216 @@
   flex-shrink: 0;
 }
 
+/* ==========================================================================
+   MOBILE & TABLET COMPREHENSIVE RESPONSIVE ENHANCEMENTS
+   Breakpoints: Mobile (320px - 767px), Tablet (768px - 1023px)
+   ========================================================================== */
+
+/* Universal Touch & Overflow Rules */
+img, video {
+  max-width: 100%;
+}
+
+.table-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Tablet & Mobile Screens (< 1024px) */
+@media (max-width: 1023px) {
+  .portal-hero-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .portal-hero-visual-wrap {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .patient-summary-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .hosp-form-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .discharge-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile Screens (< 768px) */
+@media (max-width: 767px) {
+  .portal-select-container {
+    padding: 20px 12px 36px;
+  }
+
+  .portal-hero-section .portal-select-header {
+    text-align: center;
+  }
+
+  .portal-hero-highlights {
+    justify-content: center;
+  }
+
+  .portal-hero-gradient-overlay {
+    padding: 10px 12px;
+    height: auto;
+    min-height: 100px;
+  }
+
+  .portal-flow-badge {
+    flex-wrap: wrap;
+    font-size: 0.74rem;
+    padding: 6px 12px;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .living-visual-media {
+    height: 220px;
+  }
+
+  .hero-video-meta-bar {
+    padding: 10px 14px;
+  }
+
+  .meta-bar-title {
+    font-size: 0.80rem;
+  }
+
+  .meta-bar-caption {
+    font-size: 0.75rem;
+  }
+
+  .patient-summary-cards-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .patient-summary-card {
+    padding: 16px;
+  }
+
+  .patient-welcome-banner {
+    padding: 20px 18px;
+    border-radius: 18px;
+  }
+
+  .patient-welcome-banner h1 {
+    font-size: 1.35rem;
+  }
+
+  .hosp-form-grid-3,
+  .hosp-form-grid-2,
+  .discharge-grid-3,
+  .discharge-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .hosp-form-group.col-span-2,
+  .hosp-form-group.col-span-3 {
+    grid-column: span 1;
+  }
+
+  .registration-success-card {
+    padding: 16px;
+  }
+
+  .success-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .success-details-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .dash-discharge-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 16px;
+  }
+
+  .dash-discharge-banner button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .chat-header-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .chat-header-card > div:last-child {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .chat-input-bar {
+    padding: 8px 12px;
+  }
+
+  .modal-dialog {
+    width: calc(100% - 24px);
+    max-width: 100%;
+    margin: 12px auto;
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+
+  .btn-save-patient-submit {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px;
+  }
+
+  .hosp-patient-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .hosp-patient-search {
+    width: 100%;
+  }
+}
+
+/* Extra Small Phones (< 400px) */
+@media (max-width: 399px) {
+  .portal-select-title {
+    font-size: 1.45rem;
+  }
+
+  .portal-card {
+    padding: 22px 14px;
+  }
+
+  .living-visual-media {
+    height: 190px;
+  }
+
+  .desktop-content-area {
+    padding: 12px 8px 40px;
+  }
+
+  .btn-pill {
+    padding: 7px 14px;
+    font-size: 0.8rem;
+  }
+}
+
 

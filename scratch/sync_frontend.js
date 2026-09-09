@@ -52,7 +52,8 @@ ${interactionsJs}
 ${appJs}
 `;
 fs.writeFileSync(path.join(frontendDir, 'app.js'), combinedAppJs, 'utf8');
-console.log('✓ frontend/app.js updated successfully.');
+fs.writeFileSync(path.join(rootDir, 'app.js'), combinedAppJs, 'utf8');
+console.log('✓ frontend/app.js and root app.js updated successfully.');
 
 // 3. Build frontend/index.html based on root index.html
 let rootIndexHtml = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
