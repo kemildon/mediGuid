@@ -179,9 +179,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 7. Check Active Portal & Initialize Application
-  const activePortal = localStorage.getItem('activePortal') || 'select';
-  if (typeof selectPortal === 'function') {
-    selectPortal(activePortal);
+  // 7. Check Active Portal & Initialize Application Router
+  if (typeof window !== 'undefined' && window.location.hash && window.location.hash.length > 2) {
+    if (typeof parseAndApplyHash === 'function') {
+      parseAndApplyHash(true);
+    }
+  } else {
+    const activePortal = localStorage.getItem('activePortal') || 'select';
+    if (typeof selectPortal === 'function') {
+      selectPortal(activePortal, false);
+    }
   }
 });

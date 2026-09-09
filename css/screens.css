@@ -3479,21 +3479,106 @@
   text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
-/* Fallback video / img classes to maintain strict test compatibility */
-.living-visual-media {
+/* Enlarged Doctor & Patient Care Moving Video Board (Main Attraction) */
+.portal-hero-visual-wrap.living-video-visual-wrap {
   width: 100%;
-  height: auto;
+  max-width: 980px;
+  margin: 0 auto 28px;
   position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: 0 24px 56px rgba(16, 42, 67, 0.2), 0 0 0 1px rgba(32, 178, 170, 0.28);
+  border: 3px solid #FFFFFF;
+  background: #0E3533;
 }
 
-.portal-hero-video,
+.living-visual-media {
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  position: relative;
+  background: #092625;
+}
+
+.portal-hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .portal-hero-img {
-  max-width: 100%;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.portal-hero-gradient-overlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.hero-video-meta-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(8, 28, 27, 0) 0%, rgba(8, 28, 27, 0.92) 55%, rgba(6, 22, 21, 0.98) 100%);
+  padding: 24px 24px 18px;
+  z-index: 3;
+  color: #FFFFFF;
+  box-sizing: border-box;
+}
+
+.hero-video-meta-bar .meta-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.hero-video-meta-bar .meta-bar-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #FFFFFF;
+}
+
+.hero-video-meta-bar .meta-bar-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(32, 178, 170, 0.25);
+  border: 1px solid rgba(32, 178, 170, 0.5);
+  color: #5EEAD4;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.hero-video-meta-bar .meta-bar-caption {
+  font-size: 0.85rem;
+  color: #D1FAE5;
+  margin: 0;
+  line-height: 1.45;
 }
 
 /* Tablet Responsive Queries (< 1024px) */
 @media (max-width: 1023px) {
+  .portal-hero-visual-wrap.living-video-visual-wrap {
+    max-width: 760px;
+    margin-bottom: 22px;
+  }
+
+  .living-visual-media {
+    height: 320px;
+  }
+
   .portal-hero-visual-wrap.ai-pipeline-stage {
     padding: 20px 20px 16px;
   }
@@ -3517,6 +3602,28 @@
 
   .portal-header-centered .portal-select-title {
     font-size: 1.55rem;
+  }
+
+  .portal-hero-visual-wrap.living-video-visual-wrap {
+    border-radius: 18px;
+    margin-bottom: 18px;
+    max-width: 100%;
+  }
+
+  .living-visual-media {
+    height: 230px;
+  }
+
+  .hero-video-meta-bar {
+    padding: 16px 14px 12px;
+  }
+
+  .hero-video-meta-bar .meta-bar-title {
+    font-size: 0.92rem;
+  }
+
+  .hero-video-meta-bar .meta-bar-caption {
+    font-size: 0.78rem;
   }
 
   .portal-hero-visual-wrap.ai-pipeline-stage {

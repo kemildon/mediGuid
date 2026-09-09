@@ -2680,23 +2680,119 @@ if (typeof window !== 'undefined') {
 }
 
 // --------------------------------------------------------------------------
-// 4. DUAL-PORTAL SWITCHER & AUTHENTICATION MANAGEMENT
+// 4. DUAL-PORTAL SWITCHER & AUTHENTICATION MANAGEMENT (With History / Back Support)
 // --------------------------------------------------------------------------
 
 let currentHospStockCat = 'All';
+let isHandlingPopState = false;
 
-function selectPortal(portalType) {
+function pushNavigationState(portal, screen) {
+  if (typeof window === 'undefined' || !window.history || isHandlingPopState) return;
+
+  let hash = '#/portal';
+  let title = 'MediGuid — Smart Health Assistant';
+
+  if (portal === 'hospital') {
+    hash = screen ? `#/hospital/${screen}` : '#/hospital';
+    title = screen ? `MediGuid Hospital — ${screen.replace('hosp-', '').replace(/-/g, ' ').toUpperCase()}` : 'MediGuid — Hospital Management';
+  } else if (portal === 'patient') {
+    hash = screen ? `#/patient/${screen}` : '#/patient';
+    title = screen ? `MediGuid Patient — ${screen.replace(/-/g, ' ').toUpperCase()}` : 'MediGuid — Patient Health Assistant';
+  }
+
+  const stateObj = { portal, screen };
+  try {
+    if (window.location.hash !== hash) {
+      window.history.pushState(stateObj, title, hash);
+    } else if (!window.history.state || window.history.state.portal !== portal || window.history.state.screen !== screen) {
+      window.history.replaceState(stateObj, title, hash);
+    }
+  } catch (err) {
+    // Non-blocking fallback
+  }
+  document.title = title;
+}
+
+function handlePopState(event) {
+  isHandlingPopState = true;
+  try {
+    const state = event ? event.state : null;
+    if (state && state.portal) {
+      if (state.portal === 'select' || state.portal === 'portal') {
+        selectPortal('select', true);
+      } else if (state.portal === 'hospital') {
+        selectPortal('hospital', true);
+        if (state.screen && state.screen !== 'login') {
+          hospNavigateTo(state.screen, true);
+        }
+      } else if (state.portal === 'patient') {
+        selectPortal('patient', true);
+        if (state.screen && state.screen !== 'login') {
+          patientNavigateTo(state.screen, true);
+        }
+      }
+    } else {
+      parseAndApplyHash(true);
+    }
+  } finally {
+    isHandlingPopState = false;
+  }
+}
+
+function parseAndApplyHash(isPop = false) {
+  if (typeof window === 'undefined') return;
+  const hash = window.location.hash || '';
+
+  if (hash.startsWith('#/hospital')) {
+    const parts = hash.split('/');
+    const screen = parts[2] || (localStorage.getItem('hospitalLoggedIn') === 'true' ? 'hosp-add-patient' : 'login');
+    selectPortal('hospital', isPop);
+    if (screen && screen !== 'login' && localStorage.getItem('hospitalLoggedIn') === 'true') {
+      hospNavigateTo(screen, isPop);
+    }
+  } else if (hash.startsWith('#/patient')) {
+    const parts = hash.split('/');
+    const screen = parts[2] || (localStorage.getItem('patientLoggedIn') === 'true' ? 'dashboard' : 'login');
+    selectPortal('patient', isPop);
+    if (screen && screen !== 'login' && localStorage.getItem('patientLoggedIn') === 'true') {
+      patientNavigateTo(screen, isPop);
+    }
+  } else {
+    selectPortal('select', isPop);
+  }
+}
+
+// Attach popstate and hashchange listeners when in browser
+if (typeof window !== 'undefined') {
+  window.addEventListener('popstate', handlePopState);
+  window.addEventListener('hashchange', function() {
+    if (!isHandlingPopState) {
+      parseAndApplyHash(true);
+    }
+  });
+}
+
+function selectPortal(portalType, skipHistory = false) {
   closeMobileSidebar();
   const selectScreen = document.getElementById('portalSelectionScreen');
   const hospContainer = document.getElementById('hospitalPortalContainer');
   const patContainer = document.getElementById('patientPortalContainer');
 
-  if (portalType === 'select') {
+  if (portalType === 'select' || portalType === 'portal') {
     if (selectScreen) selectScreen.style.display = 'block';
     if (hospContainer) hospContainer.style.display = 'none';
     if (patContainer) patContainer.style.display = 'none';
     localStorage.setItem('activePortal', 'select');
-    if (typeof initLandingAiAnimation === 'function') initLandingAiAnimation();
+
+    // Autoplay hero video if available
+    const heroVid = document.querySelector('.portal-hero-video');
+    if (heroVid && typeof heroVid.play === 'function') {
+      heroVid.play().catch(() => {});
+    }
+
+    if (!skipHistory) {
+      pushNavigationState('select', null);
+    }
     return;
   }
 
@@ -2713,10 +2809,17 @@ function selectPortal(portalType) {
     if (isHospLoggedIn) {
       if (hospLoginView) hospLoginView.style.display = 'none';
       if (hospLayout) hospLayout.style.display = 'flex';
-      hospNavigateTo('hosp-add-patient');
+      if (skipHistory) {
+        hospNavigateTo('hosp-add-patient', true);
+      } else {
+        hospNavigateTo('hosp-add-patient');
+      }
     } else {
       if (hospLoginView) hospLoginView.style.display = 'block';
       if (hospLayout) hospLayout.style.display = 'none';
+      if (!skipHistory) {
+        pushNavigationState('hospital', 'login');
+      }
     }
     return;
   }
@@ -2738,17 +2841,20 @@ function selectPortal(portalType) {
       const patients = typeof getStoredPatients === 'function' ? getStoredPatients() : (typeof HOSPITAL_PATIENTS !== 'undefined' ? HOSPITAL_PATIENTS : []);
       const pat = patients.find(p => p.id === currentPatId) || patients[0];
       if (pat) populateLoggedInPatientUI(pat);
-      patientNavigateTo('dashboard');
+      patientNavigateTo('dashboard', skipHistory);
     } else {
       if (patLoginView) patLoginView.style.display = 'block';
       if (patLayout) patLayout.style.display = 'none';
+      if (!skipHistory) {
+        pushNavigationState('patient', 'login');
+      }
     }
     return;
   }
 }
 
-function returnToPortalSelection() {
-  selectPortal('select');
+function returnToPortalSelection(skipHistory = false) {
+  selectPortal('select', skipHistory);
 }
 
 // --------------------------------------------------------------------------
@@ -2796,6 +2902,7 @@ let lastRegisteredPatientId = null;
 
 function hospNavigateTo(screenId) {
   closeMobileSidebar();
+  const skipHistory = arguments[1] || false;
   const screens = document.querySelectorAll('.hosp-screen');
   screens.forEach(s => s.style.display = 'none');
 
@@ -2810,6 +2917,10 @@ function hospNavigateTo(screenId) {
     renderHospitalStockManager();
   } else if (screenId === 'hosp-add-patient') {
     autoGeneratePatientId();
+  }
+
+  if (!skipHistory) {
+    pushNavigationState('hospital', screenId);
   }
 }
 
@@ -3916,6 +4027,7 @@ function openForgotPasswordModal() {
 
 function patientNavigateTo(screenId) {
   closeMobileSidebar();
+  const skipHistory = arguments[1] || false;
   const screens = document.querySelectorAll('.patient-screen');
   screens.forEach(s => s.style.display = 'none');
 
@@ -3945,6 +4057,10 @@ function patientNavigateTo(screenId) {
     if (pat && typeof populateDischargeSummaryInPatientPortal === 'function') {
       populateDischargeSummaryInPatientPortal(pat);
     }
+  }
+
+  if (!skipHistory) {
+    pushNavigationState('patient', screenId);
   }
 }
 
@@ -4220,7 +4336,14 @@ if (typeof module !== 'undefined' && module.exports) {
     toggleDischargeEdit,
     handleConfirmDischargePatient,
     populateDischargeSummaryInPatientPortal,
-    openRegisteredPatientPortal
+    openRegisteredPatientPortal,
+    pushNavigationState,
+    handlePopState,
+    parseAndApplyHash,
+    selectPortal,
+    returnToPortalSelection,
+    hospNavigateTo,
+    patientNavigateTo
   };
 }
 
@@ -4407,10 +4530,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 7. Check Active Portal & Initialize Application
-  const activePortal = localStorage.getItem('activePortal') || 'select';
-  if (typeof selectPortal === 'function') {
-    selectPortal(activePortal);
+  // 7. Check Active Portal & Initialize Application Router
+  if (typeof window !== 'undefined' && window.location.hash && window.location.hash.length > 2) {
+    if (typeof parseAndApplyHash === 'function') {
+      parseAndApplyHash(true);
+    }
+  } else {
+    const activePortal = localStorage.getItem('activePortal') || 'select';
+    if (typeof selectPortal === 'function') {
+      selectPortal(activePortal, false);
+    }
   }
 });
 

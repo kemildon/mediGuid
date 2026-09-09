@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MediGuid — Clinical Hospital System & Patient Health Assistant</title>
+  <title>MediGuid Patient — 24/7 Smart Health Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2256,5 +2256,12 @@
 <script src="voice.js"></script>
 <script src="app.js"></script>
 
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    if (typeof selectPortal === 'function') {
+      selectPortal('patient', false);
+    }
+  });
+</script>
 </body>
 </html>
