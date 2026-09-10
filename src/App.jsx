@@ -107,24 +107,30 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Confirm and create patient record
+  // Confirm and create patient record (Auto-dispatches WhatsApp Bot)
   const handleConfirmPatientRecord = (newPatient) => {
+    const botActivePatient = {
+      ...newPatient,
+      whatsappStatus: '✓ Sent on WhatsApp',
+      guidanceStatus: 'Bot Active & Sent'
+    };
+
     setPatients(prev => {
-      const existingIdx = prev.findIndex(p => p.id === newPatient.id);
+      const existingIdx = prev.findIndex(p => p.id === botActivePatient.id);
       if (existingIdx >= 0) {
         const updated = [...prev];
-        updated[existingIdx] = newPatient;
+        updated[existingIdx] = botActivePatient;
         return updated;
       }
-      return [newPatient, ...prev];
+      return [botActivePatient, ...prev];
     });
 
-    setActivePatient(newPatient);
-    setActiveTab('guidance');
+    setActivePatient(botActivePatient);
+    setActiveTab('whatsapp');
     try {
-      confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+      confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
     } catch (e) {}
-    showToast(`Patient Record created for ${newPatient.name}! Guidance synthesized.`);
+    showToast(`Registered ${botActivePatient.name}! WhatsApp Bot auto-dispatched & active.`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

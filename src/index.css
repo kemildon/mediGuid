@@ -2686,6 +2686,99 @@ input, select, textarea {
   color: #9ca3af;
 }
 
+.wa-message-bubble.incoming {
+  align-self: flex-start;
+  background: #ffffff;
+  border-radius: 0 12px 12px 12px;
+  padding: 0.75rem 0.95rem;
+  max-width: 90%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+  border: 1px solid #e2e8f0;
+}
+
+.wa-bubble-sender {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #0d9488;
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.wa-active-input-bar {
+  background: #f0f2f5;
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wa-interactive-input {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.wa-interactive-input:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
+}
+
+.wa-send-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.wa-send-btn:hover:not(:disabled) {
+  background: #128c7e;
+  transform: scale(1.05);
+}
+
+.wa-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bot-typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.5rem 0.85rem;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.bot-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0d9488;
+  display: inline-block;
+  animation: pulseDot 1s infinite alternate;
+}
+.bot-dot:nth-child(2) { animation-delay: 0.2s; }
+.bot-dot:nth-child(3) { animation-delay: 0.4s; }
+
 /* Dispatch Controls Column */
 .dispatch-controls-col {
   display: flex;

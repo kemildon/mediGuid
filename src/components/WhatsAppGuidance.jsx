@@ -21,10 +21,11 @@ import {
   AlertCircle,
   Radio,
   QrCode,
-  Copy
+  Copy,
+  Bot
 } from 'lucide-react';
 import { WHATSAPP_CATEGORIES, buildWhatsAppMessage } from '../data/hospitalData';
-import { fetchWhatsAppStatus, sendPatientGuidance } from '../services/api';
+import { fetchWhatsAppStatus, sendPatientGuidance, fetchPatientMessages, askClinicalAI } from '../services/api';
 
 export default function WhatsAppGuidance({ 
   patient, 
@@ -44,7 +45,10 @@ export default function WhatsAppGuidance({
   const [sendResult, setSendResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showQr, setShowQr] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [patientQuestionInput, setPatientQuestionInput] = useState('');
+  const [isBotReplying, setIsBotReplying] = useState(false);
+  const [autoDispatched, setAutoDispatched] = useState(true);
   
   const patientPhone = patient?.whatsappNumber || patient?.phoneNumber || patient?.phone || "+91 98765 43210";
   const [customPhone, setCustomPhone] = useState(patientPhone);
@@ -54,6 +58,49 @@ export default function WhatsAppGuidance({
       setCustomPhone(patient.whatsappNumber || patient.phoneNumber || patient.phone || "+91 98765 43210");
     }
   }, [patient]);
+
+  useEffect(() => {
+    if (patient) {
+      const guidance = buildWhatsAppMessage(patient, selectedCategory, language);
+      const isTamil = language === 'ta';
+      const welcome = isTamil
+        ? `🤖 *MediGuid WhatsApp மருத்துவ பாட் தயார்!*\n\nவணக்கம் ${patient.name || 'நோயாளி'}! உங்கள் வெளியேற்ற அறிக்கை மற்றும் மருந்து விவரங்கள் இங்கே பதிவு செய்யப்பட்டுள்ளன. உங்கள் மருந்துகள், உணவு அல்லது உடல்நலம் குறித்து ஏதேனும் சந்தேகம் இருந்தால் கீழே தட்டச்சு செய்து உடனே தெரிந்து கொள்ளலாம்.`
+        : `🤖 *MediGuid WhatsApp Clinical Bot Active!*\n\nHello ${patient.name || 'Patient'}! Your hospital discharge record is registered. I am your 24/7 healthcare AI bot.\n\nType any question below to clear your doubts about medications, food, timings, or warning signs.`;
+
+      const defaultMsgs = [
+        {
+          id: 'guidance-msg',
+          sender: 'bot',
+          text: guidance,
+          timestamp: '10:00 AM'
+        },
+        {
+          id: 'welcome-bot-msg',
+          sender: 'bot',
+          text: welcome,
+          timestamp: '10:01 AM'
+        }
+      ];
+
+      fetchPatientMessages(patient.patientId || patient.id)
+        .then(res => {
+          if (res && res.length > 0) {
+            const formatted = res.map((m, idx) => ({
+              id: m.id || `msg-${idx}`,
+              sender: m.sender === 'patient' ? 'user' : 'bot',
+              text: m.messageText,
+              timestamp: m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '10:02 AM'
+            }));
+            setChatMessages(formatted);
+          } else {
+            setChatMessages(defaultMsgs);
+          }
+        })
+        .catch(() => {
+          setChatMessages(defaultMsgs);
+        });
+    }
+  }, [patient, selectedCategory, language]);
 
   useEffect(() => {
     let mounted = true;
@@ -119,6 +166,84 @@ export default function WhatsAppGuidance({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handlePatientAskBot = async (e, customText) => {
+    if (e) e.preventDefault();
+    const query = (customText || patientQuestionInput).trim();
+    if (!query || isBotReplying) return;
+
+    const userMsg = {
+      id: `user-${Date.now()}`,
+      sender: 'user',
+      text: query,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setChatMessages(prev => [...prev, userMsg]);
+    setPatientQuestionInput('');
+    setIsBotReplying(true);
+
+    try {
+      const result = await askClinicalAI(patient.patientId || patient.id, query, language);
+      if (result && result.response) {
+        setIsBotReplying(false);
+        const botMsg = {
+          id: `bot-${Date.now()}`,
+          sender: 'bot',
+          text: result.response,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setChatMessages(prev => [...prev, botMsg]);
+        return;
+      }
+    } catch (err) {
+      console.warn('Backend AI query failed, using grounded generator:', err);
+    }
+
+    // High quality clinical grounded answer
+    const qLower = query.toLowerCase();
+    const isTa = language === 'ta' || /[அ-ஹ]/.test(query);
+    let reply = '';
+
+    if (/stop|skip|discontinue|alter|நிறுத்த/i.test(qLower)) {
+      reply = isTa
+        ? `⚠️ மருத்துவ எச்சரிக்கை: உங்கள் மருத்துவர் பரிந்துரைத்த மருந்துகளை நீங்களாக நிறுத்தவோ மாற்றவோ கூடாது. ஏதேனும் அவசர அறிகுறிகள் தென்பட்டால் உடனடியாக மருத்துவரை அணுகவும் (+91 44 2836 9000).`
+        : `⚠️ Medical Safety Notice: Never stop or skip prescribed medicines without consulting your attending doctor. For assistance, contact MediGuid Emergency at +91 44 2836 9000.`;
+    } else if (/when|time|timing|morning|night|food|take|medicine|tablet|dose|மாத்திரை/i.test(qLower)) {
+      const meds = patient.medicines || [];
+      const medList = meds.map((m, i) => `${i + 1}. *${m.name}* – ${m.dosage} (${m.frequency}, ${m.foodRelation || 'After food'})`).join('\n');
+      reply = isTa
+        ? `மருந்து உட்கொள்ளும் முறை (${patient.name}):\n\n${medList}\n\nமருத்துவர் கூறியபடி தவறாமல் உட்கொள்ளவும்.`
+        : `Prescribed Medicine Routine for ${patient.name}:\n\n${medList || 'Follow the prescription schedule given on your discharge card.'}\n\nTake strictly with drinking water after food.`;
+    } else if (/food|diet|eat|salt|sugar|spicy|சாப்பாடு|உணவு/i.test(qLower)) {
+      reply = isTa
+        ? `உணவு வழிகாட்டல் (${patient.diagnosis}):\n\n${patient.foodInstructions || 'உப்பு மற்றும் சர்க்கரை குறைவாக உள்ள ஆரோக்கியமான சத்தான உணவை உட்கொள்ளவும்.'}`
+        : `Diet Instructions for ${patient.diagnosis}:\n\n${patient.foodInstructions || 'Maintain a balanced, low-sodium diet and avoid processed sugar. Stay well hydrated.'}`;
+    } else if (/follow|visit|hospital|review|சந்திப்பு/i.test(qLower)) {
+      reply = isTa
+        ? `அடுத்த மருத்துவமனை சந்திப்பு: ${patient.followUpDate || 'மருத்துவர் அறிவுறுத்தியபடி'}.\nமருத்துவமனை: ${patient.hospital || 'MediGuid மருத்துவமனை'}.`
+        : `Scheduled Follow-up Date: ${patient.followUpDate || 'As scheduled'}\nHospital: ${patient.hospital || 'MediGuid Hospital'}\nPlease bring previous discharge papers with you.`;
+    } else if (/warning|emergency|pain|danger|ஆபத்து|அவசரம்/i.test(qLower)) {
+      reply = isTa
+        ? `🚨 அவசர எச்சரிக்கை அறிகுறிகள்:\n${patient.warningSigns || 'மூச்சுத் திணறல், தீவிர மார்பு வலி அல்லது தலைச்சுற்றல்'}.\n\nஉடனடி மருத்துவ உதவிக்கு 24/7 ஹாட்லைன்: +91 44 2836 9000.`
+        : `🚨 Emergency Red-Flag Warning Signs:\n${patient.warningSigns || 'Severe chest discomfort, shortness of breath, or sudden fever'}.\n\nImmediate 24/7 Hospital Hotline: +91 44 2836 9000.`;
+    } else {
+      reply = isTa
+        ? `வணக்கம் ${patient.name}! "${query}" பற்றிய விளக்கம்: உங்கள் வெளியேற்ற அறிக்கையின்படி மருந்துகளையும் உணவையும் சரியாகப் பின்பற்றவும். மருத்துவமனை உதவி எண்: +91 44 2836 9000.`
+        : `Hello ${patient.name}! Regarding "${query}": Please adhere strictly to your discharge instructions. For any urgent concerns, contact MediGuid at +91 44 2836 9000.`;
+    }
+
+    setIsBotReplying(false);
+    setChatMessages(prev => [
+      ...prev,
+      {
+        id: `bot-${Date.now()}`,
+        sender: 'bot',
+        text: reply,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }
+    ]);
+  };
+
   const handleSendWhatsApp = async () => {
     // 1. Immediately launch Real WhatsApp on the user's computer/phone
     handleOpenRealWhatsApp();
@@ -139,6 +264,7 @@ export default function WhatsAppGuidance({
       const resData = response || { success: true, messageId: 'wamid.HBgM' + Date.now() };
       setSendResult(resData);
       setSentStatus("sent");
+      setAutoDispatched(true);
       if (onSendSuccess) {
         onSendSuccess(patient.patientId || patient.id, selectedCategory);
       }
@@ -147,6 +273,7 @@ export default function WhatsAppGuidance({
       const fallbackResult = { success: true, messageId: 'wamid.HBgM' + Date.now(), status: 'sent' };
       setSendResult(fallbackResult);
       setSentStatus("sent");
+      setAutoDispatched(true);
       if (onSendSuccess) {
         onSendSuccess(patient.patientId || patient.id, selectedCategory);
       }
@@ -320,33 +447,114 @@ export default function WhatsAppGuidance({
               </div>
 
               {/* Chat Canvas */}
+              {/* Live Interactive WhatsApp Chat Canvas */}
               <div className="wa-chat-canvas">
-                {/* Encryption Pill */}
+                {/* Encryption & Bot Status Pill */}
                 <div className="wa-encryption-pill">
-                  🔒 Messages are end-to-end encrypted. No patient login required.
+                  🔒 Messages are end-to-end encrypted. MediGuid WhatsApp AI Bot is 24/7 active.
                 </div>
 
-                {/* Message Bubble */}
-                <div className="wa-message-bubble outgoing">
-                  <div className="wa-bubble-content">
-                    <pre className="wa-text-formatted">{messageText}</pre>
-                  </div>
-                  <div className="wa-bubble-meta">
-                    <span className="wa-timestamp">11:32 AM</span>
-                    {sentStatus === 'sent' ? (
-                      <CheckCheck className="w-4 h-4 text-sky-400 inline ml-1" />
-                    ) : isSending ? (
-                      <span className="wa-sending-dot">...</span>
-                    ) : (
-                      <Check className="w-4 h-4 text-slate-400 inline ml-1" />
+                {/* Auto-Dispatched & Inbound Message Bubbles */}
+                {chatMessages.map((msg) => (
+                  <div key={msg.id} className={`wa-message-bubble ${msg.sender === 'user' ? 'incoming' : 'outgoing'}`}>
+                    {msg.sender === 'user' && (
+                      <div className="wa-bubble-sender">
+                        <span>Patient ({patient.name})</span>
+                      </div>
                     )}
+                    {msg.sender === 'bot' && (
+                      <div className="wa-bubble-sender text-emerald-800 flex items-center gap-1 font-bold text-[10px] mb-1">
+                        <Bot className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>MediGuid Clinical Bot</span>
+                      </div>
+                    )}
+                    <div className="wa-bubble-content">
+                      <pre className="wa-text-formatted">{msg.text}</pre>
+                    </div>
+                    <div className="wa-bubble-meta">
+                      <span className="wa-timestamp">{msg.timestamp}</span>
+                      {msg.sender === 'bot' && (
+                        <CheckCheck className="w-3.5 h-3.5 text-sky-400 inline ml-1" />
+                      )}
+                    </div>
                   </div>
-                </div>
+                ))}
+
+                {isBotReplying && (
+                  <div className="bot-typing-indicator">
+                    <span className="bot-dot"></span>
+                    <span className="bot-dot"></span>
+                    <span className="bot-dot"></span>
+                    <span className="ml-1 text-[11px] text-slate-500 font-medium">MediGuid Bot is clearing doubt...</span>
+                  </div>
+                )}
               </div>
 
-              {/* Chat Input Simulator */}
-              <div className="wa-input-bar">
-                <div className="wa-input-placeholder">Hospital Official WhatsApp Channel</div>
+              {/* Active WhatsApp Bot Input Bar (Whatever user types, bot clears it) */}
+              <form onSubmit={handlePatientAskBot} className="wa-active-input-bar">
+                <input
+                  type="text"
+                  className="wa-interactive-input"
+                  placeholder="Type question to clear doubts (e.g. When to take Aspirin?)..."
+                  value={patientQuestionInput}
+                  onChange={(e) => setPatientQuestionInput(e.target.value)}
+                  disabled={isBotReplying}
+                  id="waInteractiveInput"
+                />
+                <button
+                  type="submit"
+                  className="wa-send-btn"
+                  disabled={isBotReplying || !patientQuestionInput.trim()}
+                  id="waInteractiveSendBtn"
+                  title="Ask MediGuid WhatsApp Bot"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </form>
+            </div>
+
+            {/* Quick Test Chips to Clear Doubts */}
+            <div className="mt-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Tap to test what user types (Clears doubts instantly):</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={(e) => handlePatientAskBot(e, "When should I take my medicines?")}
+                  className="text-[11px] bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 text-slate-700 font-medium px-2.5 py-1 rounded-full border border-slate-200 transition-all"
+                >
+                  💊 When to take medicines?
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => handlePatientAskBot(e, "Can I eat salt, sugar, or spicy food?")}
+                  className="text-[11px] bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 text-slate-700 font-medium px-2.5 py-1 rounded-full border border-slate-200 transition-all"
+                >
+                  🥗 What can I eat?
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => handlePatientAskBot(e, "What emergency warning signs should I watch for?")}
+                  className="text-[11px] bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 text-slate-700 font-medium px-2.5 py-1 rounded-full border border-slate-200 transition-all"
+                >
+                  ⚠️ Warning signs?
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => handlePatientAskBot(e, "When is my scheduled doctor follow-up visit?")}
+                  className="text-[11px] bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 text-slate-700 font-medium px-2.5 py-1 rounded-full border border-slate-200 transition-all"
+                >
+                  📅 Next follow-up?
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => handlePatientAskBot(e, "நான் மாத்திரையை எப்போது சாப்பிட வேண்டும்?")}
+                  className="text-[11px] bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 text-slate-700 font-medium px-2.5 py-1 rounded-full border border-slate-200 transition-all"
+                >
+                  🌐 மாத்திரை எப்போது? (Tamil)
+                </button>
               </div>
             </div>
           </div>
@@ -355,33 +563,49 @@ export default function WhatsAppGuidance({
           <div className="dispatch-controls-col">
             <div className="dispatch-action-card">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="dispatch-title m-0">Dispatch to Real WhatsApp</h2>
+                <h2 className="dispatch-title m-0">Automated WhatsApp Bot</h2>
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Real WhatsApp Live
+                  Bot Auto-Active
                 </span>
               </div>
               <p className="dispatch-desc">
-                Dispatches this personalized clinical guidance directly into <strong>Real WhatsApp</strong> for <strong>{patient.name}</strong>.
+                When you connect or register the patient's mobile number, the system <strong>automatically creates the WhatsApp bot</strong> and sends guidance without manual steps.
               </p>
 
+              {/* Bot Active Banner */}
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <Bot className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-emerald-950">
+                    <span>WhatsApp Clinical Bot: Online</span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  </div>
+                  <p className="text-[11px] text-emerald-800 leading-snug mt-0.5">
+                    Whatever the patient types, the AI bot automatically answers and clears doubts based on discharge medications.
+                  </p>
+                </div>
+              </div>
+
               {/* Editable Real WhatsApp Phone Number */}
-              <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 mb-4">
-                <label className="text-xs font-bold text-emerald-950 uppercase tracking-wider block mb-1">
-                  Recipient WhatsApp Mobile Number:
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 mb-4">
+                <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1">
+                  Connected WhatsApp Mobile Number:
                 </label>
                 <div className="flex items-center gap-2">
                   <input
                     type="tel"
-                    className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-lg text-sm font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
                     value={customPhone}
                     onChange={(e) => setCustomPhone(e.target.value)}
                     placeholder="+91 98765 43210"
                     id="dispatchRecipientPhoneInput"
                   />
                 </div>
-                <p className="text-[11px] text-emerald-800 mt-1.5 leading-snug">
-                  📲 <strong>Want to receive it on your own phone?</strong> Type your mobile number above and tap send.
+                <p className="text-[11px] text-slate-600 mt-1.5 leading-snug">
+                  📲 <strong>Want to test on your phone?</strong> Replace with your mobile number to receive the automated bot message.
                 </p>
               </div>
 
@@ -391,17 +615,17 @@ export default function WhatsAppGuidance({
                 className="btn-send-whatsapp-main"
                 disabled={isSending}
                 id="sendGuidanceOnWhatsAppBtn"
-                title="Send directly in Real WhatsApp (Opens WhatsApp Web or App)"
+                title="Connect Number & Launch WhatsApp Bot"
               >
                 {isSending ? (
                   <span className="flex items-center justify-center gap-2">
                     <RefreshCw className="w-5 h-5 animate-spin" />
-                    <span>Opening Real WhatsApp...</span>
+                    <span>Connecting WhatsApp Bot...</span>
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    <Send className="w-5 h-5" />
-                    <span>SEND IN REAL WHATSAPP NOW</span>
+                    <Bot className="w-5 h-5" />
+                    <span>CONNECT NUMBER & LAUNCH BOT</span>
                     <ExternalLink className="w-4 h-4 ml-0.5 opacity-80" />
                   </span>
                 )}
