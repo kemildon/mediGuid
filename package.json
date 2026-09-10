@@ -4,7 +4,7 @@
   "private": true,
   "description": "MediGuid - Client-Side Healthcare & Clinical Management Platform",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --open",
     "start": "vite --open",
     "build": "vite build",
     "preview": "vite preview"

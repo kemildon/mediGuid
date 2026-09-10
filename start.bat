@@ -1,14 +1,14 @@
-﻿@echo off
-title MediGuid Frontend Application
+@echo off
+title MediGuid Hospital Portal
 echo ========================================================
-echo  MediGuid - Client-Side Healthcare Assistant
-echo  Running pure frontend in single terminal mode...
+echo  MediGuid - Hospital Discharge & WhatsApp Guidance Platform
+echo  Opening workstation...
 echo ========================================================
 
 where npm >nul 2>nul
 if %errorlevel% equ 0 (
-    echo Starting Vite frontend development server...
-    npm run dev
+    echo Starting Vite local server with automatic browser launch...
+    npm run dev -- --open
     goto end
 )
 
@@ -19,7 +19,7 @@ if %errorlevel% equ 0 (
     goto end
 )
 
-echo Node.js/npm not found. Opening index.html directly in your default browser...
+echo Opening index.html directly in your default browser...
 start index.html
 
 :end
