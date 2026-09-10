@@ -30,6 +30,16 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use('/uploads', express.static(uploadsDir));
 
+// Serve static frontend assets
+const assetsDir = path.resolve(__dirname, '../assets');
+if (fs.existsSync(assetsDir)) {
+  app.use('/assets', express.static(assetsDir));
+}
+const distDir = path.resolve(__dirname, '../dist');
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+}
+
 // Health Check
 app.get('/api/health', (req, res) => {
   res.status(200).json({
@@ -145,6 +155,19 @@ app.post('/api/voice/generate', async (req, res) => {
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
   }
+});
+
+// SPA fallback: Serve index.html for frontend routes (Express 5 compatible)
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next();
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+    return next();
+  }
+  const rootIndex = path.resolve(__dirname, '../index.html');
+  if (fs.existsSync(rootIndex)) {
+    return res.sendFile(rootIndex);
+  }
+  next();
 });
 
 // Global error handler

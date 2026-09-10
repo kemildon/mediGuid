@@ -146,7 +146,7 @@ export default function WhatsAppGuidance({
   const getWhatsAppWebUrl = () => {
     const cleanNumber = getCleanPhone();
     const encodedText = encodeURIComponent(messageText);
-    return `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodedText}`;
+    return `https://wa.me/${cleanNumber}?text=${encodedText}`;
   };
 
   const getWhatsAppAppUrl = () => {
@@ -157,7 +157,14 @@ export default function WhatsAppGuidance({
 
   const handleOpenRealWhatsApp = () => {
     const url = getWhatsAppWebUrl();
-    window.open(url, '_blank');
+    try {
+      const win = window.open(url, '_blank');
+      if (!win) {
+        window.location.assign(url);
+      }
+    } catch (e) {
+      window.location.assign(url);
+    }
   };
 
   const handleCopyMessage = () => {
@@ -257,7 +264,11 @@ export default function WhatsAppGuidance({
         patientId: patient.patientId || patient.id,
         category: selectedCategory,
         language: language,
-        customMessage: messageText
+        customMessage: messageText,
+        phoneNumber: customPhone,
+        recipientPhone: customPhone,
+        whatsappNumber: customPhone,
+        patient: patient
       });
 
       setIsSending(false);

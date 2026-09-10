@@ -29,9 +29,11 @@ class WhatsAppService {
    */
   cleanPhoneNumber(phone) {
     if (!phone) return '';
-    let cleaned = phone.replace(/[^\d]/g, '');
-    // If 10 digits (common in India), prepend country code 91
-    if (cleaned.length === 10) {
+    let cleaned = String(phone).replace(/[^\d]/g, '');
+    // If 11 digits starting with 0 (e.g. 09840123456), convert to 919840123456
+    if (cleaned.startsWith('0') && cleaned.length === 11) {
+      cleaned = '91' + cleaned.slice(1);
+    } else if (cleaned.length === 10) {
       cleaned = '91' + cleaned;
     }
     return cleaned;
@@ -60,6 +62,7 @@ class WhatsAppService {
       };
     }
 
+    const directUrl = `https://wa.me/${formattedTo}?text=${encodeURIComponent(messageBody)}`;
     const url = `${this.baseUrl}/${this.apiVersion}/${config.phoneNumberId || '109823485721094'}/messages`;
     const payload = {
       messaging_product: 'whatsapp',
@@ -125,13 +128,15 @@ class WhatsAppService {
         messageId: waMessageId,
         status: 'sent',
         recipient: formattedTo,
+        directUrl,
         isConfirmed: true
       };
     } catch (networkErr) {
       console.error('❌ Network error calling WhatsApp API:', networkErr);
       return {
         success: false,
-        error: 'Network connection failure while contacting Meta WhatsApp API: ' + networkErr.message
+        error: 'Network connection failure while contacting Meta WhatsApp API: ' + networkErr.message,
+        directUrl
       };
     }
   }

@@ -1,4 +1,5 @@
 const { run, get, all } = require('../config/db');
+const whatsappService = require('../services/whatsappService');
 
 /**
  * Confirm and save extracted patient data to the database
@@ -108,16 +109,7 @@ async function confirmPatientData(req, res) {
     const autoMessage = `Hello ${patientName} 👋\n\n*MediGuid WhatsApp Clinical Health Bot Connected!*\n\nHere is your discharge schedule from ${hospitalName || 'MediGuid Hospital'}:\n\n🩺 *Diagnosis:* ${diagnosis || 'Discharge'}\n💊 *Prescribed Medications:*\n${medLines}\n\n🍎 *Diet Advice:* ${dietInstructions || 'Healthy balanced diet'}\n📅 *Follow-up Visit:* ${followUpDate || 'As advised'}\n\n🤖 *24/7 WhatsApp AI Bot Active:* You can reply to this message anytime with any question about your medicines or health to clear your doubts!`;
 
     try {
-      await run(`
-        INSERT INTO whatsapp_messages (patientId, waMessageId, recipientPhone, messageBody, status, sentAt)
-        VALUES (?, ?, ?, ?, 'sent', CURRENT_TIMESTAMP)
-      `, [patientId, initialWaMessageId, formattedPhone, autoMessage]);
-
-      await run(`
-        INSERT INTO conversations (patientId, sender, messageText, waMessageId)
-        VALUES (?, 'bot', ?, ?)
-      `, [patientId, autoMessage, initialWaMessageId]);
-
+      await whatsappService.sendTextMessage(formattedPhone, autoMessage, patientId);
       await run(`
         UPDATE patients SET
           whatsappStatus = '✓ Sent on WhatsApp',

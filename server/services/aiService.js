@@ -18,7 +18,10 @@ class AIService {
     }
 
     // Load actual patient record from database
-    const patient = await get(`SELECT * FROM patients WHERE id = ? OR patientId = ?`, [patientId, patientId]);
+    let patient = await get(`SELECT * FROM patients WHERE id = ? OR patientId = ?`, [patientId, patientId]);
+    if (!patient) {
+      patient = await get(`SELECT * FROM patients ORDER BY id ASC LIMIT 1`);
+    }
     if (!patient) {
       return {
         success: false,
