@@ -317,7 +317,7 @@ export default function WhatsAppGuidance({
           </p>
         </div>
 
-        {/* Patient Switcher for Quick Demos */}
+        {/* Active Patient Selector */}
         {allPatients.length > 1 && (
           <div className="patient-quick-select">
             <span className="text-xs text-slate-500 font-medium">Active Patient:</span>
@@ -524,11 +524,11 @@ export default function WhatsAppGuidance({
               </form>
             </div>
 
-            {/* Quick Test Chips to Clear Doubts */}
+            {/* Quick Question Chips to Clear Doubts */}
             <div className="mt-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Tap to test what user types (Clears doubts instantly):</span>
+                <span>Frequently Asked Patient Questions:</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 <button

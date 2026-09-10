@@ -87,7 +87,7 @@ export default function LandingPage({ onEnterPortal }) {
               <video
                 className="landing-hero-video"
                 src="assets/hero-reel.mp4"
-                poster="assets/hero-demo-poster.jpg"
+                poster="assets/doctor_patient_care.jpg"
                 autoPlay
                 muted
                 loop

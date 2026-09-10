@@ -6,7 +6,6 @@ import {
   ShieldCheck, 
   ArrowLeft, 
   LogIn, 
-  Sparkles,
   AlertCircle
 } from 'lucide-react';
 
@@ -41,21 +40,6 @@ export default function PortalLogin({ onLoginSuccess, onBackToHome }) {
     }, 600);
   };
 
-  const handleQuickDemoLogin = () => {
-    setHospitalId('HOSP-ADMIN-01');
-    setPassword('mediguid2026');
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onLoginSuccess({
-        id: 'HOSP-ADMIN-01',
-        staffName: 'Dr. R. K. Sharma',
-        role: 'Chief Medical Officer / Administrator',
-        hospital: 'MediGuid Central Multi-Specialty Hospital'
-      });
-    }, 400);
-  };
-
   return (
     <div className="portal-login-root">
       <div className="portal-login-container">
@@ -78,17 +62,6 @@ export default function PortalLogin({ onLoginSuccess, onBackToHome }) {
             <p className="login-subtitle">
               Authorized Healthcare Staff & Hospital Management Workstation
             </p>
-          </div>
-
-          {/* Quick Demo Helper Banner */}
-          <div className="demo-login-chip" onClick={handleQuickDemoLogin} role="button" tabIndex={0}>
-            <div className="demo-chip-icon">
-              <Sparkles className="w-4 h-4 text-amber-600" />
-            </div>
-            <div className="demo-chip-text">
-              <span className="demo-chip-label">College Project Demo:</span>
-              <span className="demo-chip-action">Click here to auto-login as Dr. R. K. Sharma</span>
-            </div>
           </div>
 
           {error && (

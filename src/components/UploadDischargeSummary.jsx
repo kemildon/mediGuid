@@ -13,13 +13,11 @@ import {
   RefreshCw,
   Cpu
 } from 'lucide-react';
-import { SAMPLE_DISCHARGE_PRESETS } from '../data/hospitalData';
 import { uploadDischargeFile } from '../services/api';
 
 export default function UploadDischargeSummary({ onExtractionComplete }) {
-  const [selectedPreset, setSelectedPreset] = useState(SAMPLE_DISCHARGE_PRESETS[0]);
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [previewText, setPreviewText] = useState(SAMPLE_DISCHARGE_PRESETS[0].previewText);
+  const [previewText, setPreviewText] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState(0); // 0: Idle, 1: Uploading, 2: Reading Document, 3: Extracting Information, 4: Creating Patient Record
@@ -33,13 +31,6 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
     { label: "Extracting Information", desc: "NLP entity extraction: Diagnosis, Meds, Dosages, Diet..." },
     { label: "Creating Patient Record", desc: "Structuring electronic patient health record..." }
   ];
-
-  const handleSelectPreset = (preset) => {
-    setSelectedPreset(preset);
-    setUploadedFile(null);
-    setErrorMessage(null);
-    setPreviewText(preset.previewText);
-  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -91,6 +82,11 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
   };
 
   const handleProcessSummary = async () => {
+    if (!uploadedFile) {
+      setErrorMessage('Please upload a patient discharge summary file (PDF, image, or text) to extract.');
+      return;
+    }
+
     setIsProcessing(true);
     setErrorMessage(null);
     setProcessingStep(1); // Uploading
@@ -99,18 +95,7 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
     const stepTimer2 = setTimeout(() => setProcessingStep(3), 1200); // Extracting Information
 
     try {
-      let fileToUpload = uploadedFile;
-      if (!fileToUpload && selectedPreset) {
-        // Use selected preset's text as a real file
-        const blob = new Blob([selectedPreset.previewText], { type: 'text/plain' });
-        fileToUpload = new File([blob], `${selectedPreset.id}.txt`, { type: 'text/plain' });
-      }
-
-      if (!fileToUpload) {
-        throw new Error('Please select a sample summary or upload a discharge file.');
-      }
-
-      const result = await uploadDischargeFile(fileToUpload);
+      const result = await uploadDischargeFile(uploadedFile);
       clearTimeout(stepTimer1);
       clearTimeout(stepTimer2);
       setProcessingStep(4); // Creating Patient Record
@@ -143,30 +128,6 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
             Upload hospital discharge papers, scanned prescriptions, or clinical PDFs. 
             MediGuid's neural OCR automatically extracts all patient details, medications, and follow-up guidance.
           </p>
-        </div>
-      </div>
-
-      {/* 2. Sample Presets Picker (for effortless demo & evaluation) */}
-      <div className="sample-presets-bar">
-        <span className="presets-label">
-          <Sparkles className="w-4 h-4 text-amber-500 inline mr-1" />
-          Demo Sample Discharge Summaries (1-Click Load):
-        </span>
-        <div className="presets-chips-row">
-          {SAMPLE_DISCHARGE_PRESETS.map((p) => {
-            const isSelected = selectedPreset?.id === p.id && !uploadedFile;
-            return (
-              <button
-                key={p.id}
-                onClick={() => handleSelectPreset(p)}
-                className={`preset-chip ${isSelected ? 'active' : ''}`}
-                disabled={isProcessing}
-              >
-                <span className="chip-badge">{p.badge}</span>
-                <span className="chip-text">{p.label}</span>
-              </button>
-            );
-          })}
         </div>
       </div>
 
@@ -256,21 +217,30 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
                 <span className="font-semibold text-slate-800 text-sm">Discharge Document Preview</span>
               </div>
               <span className="badge-preview-tag">
-                {uploadedFile ? 'Custom Upload' : (selectedPreset?.badge || 'Sample Preset')}
+                {uploadedFile ? `${uploadedFile.name} (${(uploadedFile.size / 1024).toFixed(1)} KB)` : 'Awaiting Document'}
               </span>
             </div>
 
             <div className="preview-card-body">
-              {/* Document Simulator */}
-              <div className="document-sheet">
-                <div className="sheet-watermark">HOSPITAL DISCHARGE</div>
-                <pre className="sheet-text">{previewText}</pre>
-                
-                {/* Laser scanning effect when processing */}
-                {isProcessing && (
-                  <div className="scanner-laser-bar"></div>
-                )}
-              </div>
+              {uploadedFile ? (
+                <div className="document-sheet">
+                  <div className="sheet-watermark">HOSPITAL DISCHARGE</div>
+                  <pre className="sheet-text">{previewText}</pre>
+                  
+                  {/* Laser scanning effect when processing */}
+                  {isProcessing && (
+                    <div className="scanner-laser-bar"></div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center p-12 text-center text-slate-400 min-h-[340px] bg-slate-50/60 rounded-lg border border-dashed border-slate-200">
+                  <FileText className="w-16 h-16 text-slate-300 mb-3" />
+                  <h4 className="text-sm font-bold text-slate-700">No Document Selected</h4>
+                  <p className="text-xs text-slate-500 max-w-xs mt-1.5 leading-relaxed">
+                    Upload or drag & drop a clinical discharge summary PDF or scanned image to inspect document content before running AI extraction.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Primary Action Button */}
@@ -278,7 +248,7 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
               <button
                 onClick={handleProcessSummary}
                 className="btn-process-summary"
-                disabled={isProcessing}
+                disabled={isProcessing || !uploadedFile}
                 id="processSummaryBtn"
               >
                 {isProcessing ? (

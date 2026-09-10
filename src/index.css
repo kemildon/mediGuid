@@ -666,38 +666,7 @@ input, select, textarea {
 .login-subtitle {
   font-size: 0.85rem;
   color: var(--text-muted);
-}
-
-.demo-login-chip {
-  background: #fef3c7;
-  border: 1px dashed #f59e0b;
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
   margin-bottom: 1.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.demo-login-chip:hover {
-  background: #fde68a;
-  transform: translateY(-1px);
-}
-
-.demo-chip-label {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #92400e;
-}
-
-.demo-chip-action {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #b45309;
 }
 
 .login-error-alert {
