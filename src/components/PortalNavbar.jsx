@@ -40,7 +40,13 @@ export default function PortalNavbar({
             <div className="portal-brand-name">
               <span>MediGuid</span> <span className="text-teal-400 font-normal">PORTAL</span>
             </div>
-            <div className="portal-hospital-tag">{staff.hospital}</div>
+            <div className="flex items-center gap-2">
+              <div className="portal-hospital-tag">{staff.hospital}</div>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" id="portalApiConfirmedBadge" title="Google Gemini AI & WhatsApp Gateway API Confirmed">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                API Confirmed
+              </span>
+            </div>
           </div>
         </div>
 

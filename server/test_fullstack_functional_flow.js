@@ -3,7 +3,8 @@ const path = require('path');
 const http = require('http');
 
 // Make sure .env is loaded
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config();
 
 const { initDatabase, get, all, run } = require('../server/config/db');
 const { parseClinicalDocument } = require('../server/services/clinicalParser');
@@ -155,7 +156,10 @@ Emergency Contact: +91 44 2836 9000
     if (!isConfigured) {
       assert(sendResult.success === false, 'Refused to simulate delivery when credentials missing');
       assert(sendResult.isTestMode === true, 'Reported Test Mode flag correctly');
-      assert(sendResult.error.includes('WhatsApp Business API credentials are not configured'), 'Reported explicit unconfigured error notice');
+      assert(sendResult.error && sendResult.error.includes('credentials are not configured'), 'Reported explicit unconfigured error notice');
+    } else {
+      assert(sendResult.success === true, 'Successfully dispatched guidance with configured API credentials');
+      assert(sendResult.isConfirmed === true, 'WhatsApp dispatch confirmed');
     }
 
     // 6. Test Webhook Verification

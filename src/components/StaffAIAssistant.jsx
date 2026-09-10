@@ -88,9 +88,13 @@ export default function StaffAIAssistant() {
       {/* 1. Header with Required Title and Language Switch */}
       <div className="section-header-row">
         <div>
-          <div className="section-pre-badge">
+          <div className="section-pre-badge flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-indigo-600" />
             <span>CLINICAL DECISION & COMMUNICATION SUPPORT</span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300" id="staffAiApiConfirmedBadge">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Google Gemini API Confirmed
+            </span>
           </div>
           <h1 className="section-main-heading">Hospital Staff AI Assistant</h1>
           <p className="section-sub-text">

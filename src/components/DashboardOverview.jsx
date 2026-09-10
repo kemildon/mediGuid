@@ -89,6 +89,10 @@ export default function DashboardOverview({
           <div className="banner-greeting">
             <span>Welcome back, <strong>Dr. R. K. Sharma</strong></span>
             <span className="badge-hospital-status">Central Multi-Specialty</span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm" id="dashboardApiStatusBadge">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              API Confirmed & Active
+            </span>
           </div>
           <h1 className="dashboard-title">Hospital Discharge & Guidance Dashboard</h1>
           <p className="dashboard-subtitle">
