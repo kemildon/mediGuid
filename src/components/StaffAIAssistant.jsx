@@ -13,14 +13,16 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { STAFF_AI_KNOWLEDGE } from '../data/hospitalData';
+import { askStaffAI } from '../services/api';
 
 export default function StaffAIAssistant() {
   const [language, setLanguage] = useState("en"); // "en" or "ta"
   const [inputQuery, setInputQuery] = useState("");
+  const [isThinking, setIsThinking] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     {
       sender: "ai",
-      text: "Hello Doctor / Hospital Staff! 👋 I am your MediGuid Clinical Staff Assistant. I can help simplify complex medical terminology, draft patient-friendly WhatsApp guidance, format medicine timetables, and translate clinical instructions into Tamil (தமிழ்)."
+      text: "Hello Doctor / Hospital Staff! 👋 I am your MediGuid Clinical Staff Assistant powered by Google Gemini. I can help simplify complex medical terminology, draft patient-friendly WhatsApp guidance, format medicine timetables, and translate clinical instructions into Tamil (தமிழ்)."
     }
   ]);
   const [copiedIndex, setCopiedIndex] = useState(null);
@@ -33,14 +35,29 @@ export default function StaffAIAssistant() {
     { label: "Translate to Tamil", query: "Translate discharge guidance into Tamil" }
   ];
 
-  const handleSend = (textToSend) => {
+  const handleSend = async (textToSend) => {
     const query = textToSend || inputQuery;
-    if (!query.trim()) return;
+    if (!query.trim() || isThinking) return;
 
     const userMsg = { sender: "user", text: query };
-    const lower = query.toLowerCase();
+    setChatMessages(prev => [...prev, userMsg]);
+    setInputQuery("");
+    setIsThinking(true);
 
-    // Match against clinical knowledge base
+    try {
+      // Try live Google Gemini API query
+      const liveResult = await askStaffAI(query, language);
+      if (liveResult && liveResult.success && liveResult.response) {
+        setIsThinking(false);
+        setChatMessages(prev => [...prev, { sender: "ai", text: liveResult.response }]);
+        return;
+      }
+    } catch (e) {
+      console.warn('Gemini query failed, falling back to clinical knowledge base:', e);
+    }
+
+    // Fallback: match against clinical knowledge base
+    const lower = query.toLowerCase();
     let matched = STAFF_AI_KNOWLEDGE.find(k => 
       k.keywords.some(kw => lower.includes(kw))
     );
@@ -56,8 +73,8 @@ export default function StaffAIAssistant() {
       }
     }
 
-    setChatMessages(prev => [...prev, userMsg, { sender: "ai", text: answer }]);
-    setInputQuery("");
+    setIsThinking(false);
+    setChatMessages(prev => [...prev, { sender: "ai", text: answer }]);
   };
 
   const handleCopy = (text, index) => {
@@ -161,6 +178,22 @@ export default function StaffAIAssistant() {
               </div>
             );
           })}
+
+          {isThinking && (
+            <div className="ai-message-row ai-row">
+              <div className="msg-avatar-circle">
+                <Bot className="w-4 h-4 text-teal-600 animate-pulse" />
+              </div>
+              <div className="msg-bubble ai-bubble flex items-center gap-2 py-3 px-4">
+                <span className="text-xs text-slate-500 font-medium">Gemini is synthesizing clinical response...</span>
+                <span className="flex gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-bounce"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-bounce [animation-delay:0.2s]"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-bounce [animation-delay:0.4s]"></span>
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Chat Input Bar */}

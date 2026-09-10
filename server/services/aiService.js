@@ -175,7 +175,60 @@ class AIService {
   }
 
   /**
-   * Call external LLM (OpenAI / Gemini) with strict clinical system prompt
+   * Hospital Staff AI Assistant query using Gemini
+   */
+  async answerStaffQuery(query, language = 'en') {
+    if (!query) return { success: false, error: 'Query is required' };
+
+    const apiKey = process.env.AI_API_KEY;
+    const isTamil = language === 'ta' || /தமிழ்|tamil/i.test(query);
+
+    if (apiKey && (apiKey.startsWith('AQ.') || apiKey.startsWith('AIza') || apiKey.startsWith('sk-'))) {
+      const prompt = `You are a clinical communication assistant for hospital staff at MediGuid Multi-Specialty Hospital.
+Help hospital staff, doctors, and nurses simplify medical terminology, format medication timetables, draft patient discharge advice, and translate clinical guidance into clear Tamil when requested.
+Always ensure clinical accuracy and patient-centered empathy.
+Target Language: ${isTamil ? 'Tamil (தமிழ்)' : 'English'}.
+
+Hospital Staff Query: "${query}"`;
+
+      try {
+        if (apiKey.startsWith('AQ.') || apiKey.startsWith('AIza')) {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          });
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          if (text) {
+            return { success: true, response: text, language: isTamil ? 'ta' : 'en', source: 'gemini' };
+          }
+        } else if (apiKey.startsWith('sk-')) {
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [{ role: 'system', content: prompt }],
+              max_tokens: 500
+            })
+          });
+          const data = await res.json();
+          const text = data?.choices?.[0]?.message?.content?.trim();
+          if (text) {
+            return { success: true, response: text, language: isTamil ? 'ta' : 'en', source: 'openai' };
+          }
+        }
+      } catch (err) {
+        console.warn('External AI query failed, falling back to local clinical knowledge:', err.message);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Call external LLM (Gemini / OpenAI) with strict clinical system prompt
    */
   async callExternalLLM(patient, medicines, question, wantsTamil) {
     const medList = medicines.map(m => `${m.medicineName}: ${m.dosage}, ${m.frequency}, ${m.beforeOrAfterFood}`).join('; ');
@@ -200,17 +253,26 @@ RULES:
 
 PATIENT QUESTION: "${question}"`;
 
-    // Support OpenAI or Google Generative AI based on key format
+    // Support Google Gemini AI (both new AQ. and legacy AIza format) or OpenAI
     const apiKey = process.env.AI_API_KEY;
-    if (apiKey.startsWith('AIza')) {
+    if (apiKey.startsWith('AQ.') || apiKey.startsWith('AIza')) {
       // Gemini API
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-      });
-      const data = await res.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Please contact your hospital.';
+      const models = ['gemini-3.5-flash-lite', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+      for (const model of models) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          });
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          if (text) return text;
+        } catch (e) {
+          console.warn(`Gemini model ${model} error:`, e.message);
+        }
+      }
+      return 'Please contact your hospital.';
     } else {
       // OpenAI API
       const res = await fetch('https://api.openai.com/v1/chat/completions', {

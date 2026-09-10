@@ -147,6 +147,23 @@ export async function askClinicalAI(patientId, question, language = 'en') {
 }
 
 /**
+ * Query Gemini AI for hospital staff communication & clinical assistance
+ */
+export async function askStaffAI(query, language = 'en') {
+  try {
+    const response = await fetch(`${API_BASE}/ai/staff-query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, language }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    return { success: false, fallback: true };
+  }
+}
+
+/**
  * Synthesize voice audio
  */
 export async function synthesizeVoice(text, language = 'en') {

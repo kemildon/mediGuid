@@ -113,6 +113,23 @@ app.post('/api/ai/patient-response', async (req, res) => {
   }
 });
 
+// 7b. Staff AI Assistant Query (using Gemini)
+app.post('/api/ai/staff-query', async (req, res) => {
+  try {
+    const { query, language } = req.body;
+    if (!query) {
+      return res.status(400).json({ success: false, error: 'query is required' });
+    }
+    const result = await aiService.answerStaffQuery(query, language);
+    if (result) {
+      return res.status(200).json(result);
+    }
+    return res.status(200).json({ success: false, fallback: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // 8. Voice Audio Synthesis Route
 app.post('/api/voice/generate', async (req, res) => {
   try {
