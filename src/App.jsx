@@ -1,126 +1,248 @@
-﻿import React, { useState } from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import ProblemSection from './components/ProblemSection';
-import SolutionSection from './components/SolutionSection';
-import HowItWorks from './components/HowItWorks';
-import CardPreviewer from './components/CardPreviewer';
-import AccessibilitySection from './components/AccessibilitySection';
-import ProductShowcase from './components/ProductShowcase';
-import WorkflowSection from './components/WorkflowSection';
-import CardGeneratorModal from './components/CardGeneratorModal';
-import Footer from './components/Footer';
-import SmartCard from './components/SmartCard';
-import { DEFAULT_CARD } from './data/sampleCards';
+import React, { useState, useEffect } from 'react';
+import LandingPage from './components/LandingPage';
+import PortalLogin from './components/PortalLogin';
+import PortalNavbar from './components/PortalNavbar';
+import DashboardOverview from './components/DashboardOverview';
+import UploadDischargeSummary from './components/UploadDischargeSummary';
+import ExtractedInfoReview from './components/ExtractedInfoReview';
+import GeneratedGuidanceView from './components/GeneratedGuidanceView';
+import WhatsAppGuidance from './components/WhatsAppGuidance';
+import PatientRecords from './components/PatientRecords';
+import DischargeHistory from './components/DischargeHistory';
+import StaffAIAssistant from './components/StaffAIAssistant';
+import { INITIAL_PATIENTS } from './data/hospitalData';
 import confetti from 'canvas-confetti';
 
 export default function App() {
-  const [activeCard, setActiveCard] = useState(DEFAULT_CARD);
-  const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  // Navigation: 'landing' | 'login' | 'dashboard'
+  const [currentView, setCurrentView] = useState('landing');
+  
+  // Dashboard Tabs: 'overview' | 'upload' | 'extracted' | 'guidance' | 'whatsapp' | 'records' | 'history' | 'assistant'
+  const [activeTab, setActiveTab] = useState('overview');
 
-  const handleOpenGenerator = () => {
-    setIsGeneratorOpen(true);
-  };
+  // Hospital staff authentication state
+  const [staff, setStaff] = useState({
+    staffName: 'Dr. R. K. Sharma',
+    hospital: 'MediGuid Central Hospital'
+  });
 
-  const handleCloseGenerator = () => {
-    setIsGeneratorOpen(false);
-  };
-
-  const handleSaveCard = (newCardData) => {
-    setActiveCard(newCardData);
-    // Trigger celebratory confetti for prototype effect
+  // Patient database (persisted to localStorage if available)
+  const [patients, setPatients] = useState(() => {
     try {
-      confetti({
-        particleCount: 60,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      const saved = localStorage.getItem('mediguid_patients');
+      if (saved) return JSON.parse(saved);
     } catch (e) {}
+    return INITIAL_PATIENTS;
+  });
+
+  // Current patient in focus
+  const [extractedPatient, setExtractedPatient] = useState(null);
+  const [activePatient, setActivePatient] = useState(patients[0]);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  // Sync to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('mediguid_patients', JSON.stringify(patients));
+    } catch (e) {}
+  }, [patients]);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4000);
   };
 
-  const handleTriggerPrint = () => {
-    window.print();
+  // Flow Handlers
+  const handleEnterPortal = () => {
+    setCurrentView('login');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const handleLoginSuccess = (staffData) => {
+    setStaff(staffData);
+    setCurrentView('dashboard');
+    setActiveTab('overview');
+    showToast(`Logged in successfully as ${staffData.staffName}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLogout = () => {
+    setCurrentView('landing');
+    setActiveTab('overview');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // OCR Extraction Completion
+  const handleExtractionComplete = (extractedData) => {
+    setExtractedPatient(extractedData);
+    setActiveTab('extracted');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Confirm and create patient record
+  const handleConfirmPatientRecord = (newPatient) => {
+    setPatients(prev => {
+      const existingIdx = prev.findIndex(p => p.id === newPatient.id);
+      if (existingIdx >= 0) {
+        const updated = [...prev];
+        updated[existingIdx] = newPatient;
+        return updated;
+      }
+      return [newPatient, ...prev];
+    });
+
+    setActivePatient(newPatient);
+    setActiveTab('guidance');
+    try {
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+    } catch (e) {}
+    showToast(`Patient Record created for ${newPatient.name}! Guidance synthesized.`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Guidance proceed to WhatsApp
+  const handleProceedToWhatsApp = (patient) => {
+    setActivePatient(patient);
+    setActiveTab('whatsapp');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // WhatsApp Guidance Sent
+  const handleWhatsAppSendSuccess = (patientId, categoryId) => {
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId) {
+        return {
+          ...p,
+          guidanceStatus: "Guidance Sent",
+          whatsappStatus: "✓ Sent on WhatsApp",
+          lastSentDate: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        };
+      }
+      return p;
+    }));
+
+    try {
+      confetti({ particleCount: 70, spread: 70, origin: { y: 0.5 } });
+    } catch (e) {}
+    showToast(`✓ Guidance Sent Successfully on WhatsApp to ${activePatient?.name}!`);
+  };
+
+  // Navigation from Patient Records or Dashboard Table
+  const handleSelectPatient = (patient, targetTab) => {
+    setActivePatient(patient);
+    setActiveTab(targetTab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Pending count calculation
+  const pendingCount = patients.filter(p => p.guidanceStatus === 'Ready to Send').length;
 
   return (
-    <div className="carecard-app-root">
-      {/* 1. Header Navigation Bar */}
-      <Navbar 
-        onOpenGenerator={handleOpenGenerator} 
-        onTriggerPrint={handleTriggerPrint} 
-      />
-
-      <main>
-        {/* 2. Hero Section with Large 3D Card Mockup & Transformation Demo */}
-        <Hero 
-          cardData={activeCard} 
-          onOpenGenerator={handleOpenGenerator}
-          onTriggerPrint={handleTriggerPrint}
-        />
-
-        {/* 3. The Problem: Complex medical papers vs confused patient */}
-        <ProblemSection />
-
-        {/* 4. Our Solution: 4 Pillars (Medicine, Food, Activity, Warning) */}
-        <SolutionSection />
-
-        {/* 5. How It Works: 4-Step Horizontal Process with Animated Arrows */}
-        <HowItWorks />
-
-        {/* 6. Interactive CareCard Preview Workbench (Flip, Languages, Presets) */}
-        <CardPreviewer 
-          activeCard={activeCard}
-          onSelectPreset={setActiveCard}
-          onOpenGenerator={handleOpenGenerator}
-          onTriggerPrint={handleTriggerPrint}
-        />
-
-        {/* 7. Accessibility: Designed for Everyone (No Phone Required) */}
-        <AccessibilitySection 
-          onTriggerPrint={handleTriggerPrint}
-        />
-
-        {/* 8. Physical Product Showcase on Table */}
-        <ProductShowcase />
-
-        {/* 9. Hospital Workflow: Simple 5-Node Linear Handover */}
-        <WorkflowSection />
-      </main>
-
-      {/* 10. Final CTA & Footer with Medical Disclaimer */}
-      <Footer 
-        onOpenGenerator={handleOpenGenerator} 
-      />
-
-      {/* 11. Interactive CareCard Generator Modal */}
-      <CardGeneratorModal 
-        isOpen={isGeneratorOpen}
-        onClose={handleCloseGenerator}
-        currentCard={activeCard}
-        onSaveCard={handleSaveCard}
-        onTriggerPrint={handleTriggerPrint}
-      />
-
-      {/* ==================================================================
-          DEDICATED PRINT CONTAINER (Shown ONLY during @media print)
-          Prints front and back of the card on standard card/A4 paper
-          ================================================================== */}
-      <div className="printable-card-wrapper" style={{ display: 'none' }}>
-        <div style={{ textAlign: 'center', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #000' }}>
-          <h2 style={{ fontSize: '18pt', fontWeight: 'bold' }}>CareCard Physical Health Card</h2>
-          <p style={{ fontSize: '10pt', color: '#555' }}>Cut along dotted borders. Standard Pocket / Laminated Card Format.</p>
+    <div className="mediguid-app-root">
+      {/* Toast Notification Banner */}
+      {toastMessage && (
+        <div className="global-toast-banner" role="alert">
+          <div className="toast-dot"></div>
+          <span>{toastMessage}</span>
         </div>
+      )}
 
-        <div style={{ marginBottom: '30px' }}>
-          <div style={{ fontSize: '11pt', fontWeight: 'bold', marginBottom: '6px' }}>FRONT SIDE (Identification & Condition)</div>
-          <SmartCard cardData={activeCard} isPrintMode={true} isFlipped={false} />
-        </div>
+      {/* VIEW 1: Landing Page */}
+      {currentView === 'landing' && (
+        <LandingPage onEnterPortal={handleEnterPortal} />
+      )}
 
-        <div style={{ pageBreakBefore: 'always', marginTop: '30px' }}>
-          <div style={{ fontSize: '11pt', fontWeight: 'bold', marginBottom: '6px' }}>BACK SIDE (Daily Timetable & Instructions)</div>
-          <SmartCard cardData={activeCard} isPrintMode={true} isFlipped={true} />
+      {/* VIEW 2: Portal Login */}
+      {currentView === 'login' && (
+        <PortalLogin 
+          onLoginSuccess={handleLoginSuccess}
+          onBackToHome={() => setCurrentView('landing')}
+        />
+      )}
+
+      {/* VIEW 3: Hospital Portal Workstation Dashboard */}
+      {currentView === 'dashboard' && (
+        <div className="portal-workstation-layout">
+          <PortalNavbar 
+            activeTab={activeTab}
+            onSelectTab={setActiveTab}
+            onLogout={handleLogout}
+            pendingCount={pendingCount}
+            staff={staff}
+          />
+
+          <main className="workstation-main-content">
+            <div className="workstation-container">
+              {/* Tab 1: Dashboard Overview */}
+              {activeTab === 'overview' && (
+                <DashboardOverview 
+                  patients={patients}
+                  onNavigateTab={setActiveTab}
+                  onSelectPatient={handleSelectPatient}
+                />
+              )}
+
+              {/* Tab 2: Upload Discharge Summary */}
+              {activeTab === 'upload' && (
+                <UploadDischargeSummary 
+                  onExtractionComplete={handleExtractionComplete}
+                />
+              )}
+
+              {/* Tab 3: Extracted Information Confirmation */}
+              {activeTab === 'extracted' && (
+                <ExtractedInfoReview 
+                  extractedData={extractedPatient || patients[0]}
+                  onConfirmAndCreate={handleConfirmPatientRecord}
+                  onBackToUpload={() => setActiveTab('upload')}
+                />
+              )}
+
+              {/* Tab 4: Automatic Guidance Generation */}
+              {activeTab === 'guidance' && (
+                <GeneratedGuidanceView 
+                  patient={activePatient}
+                  onProceedToWhatsApp={handleProceedToWhatsApp}
+                />
+              )}
+
+              {/* Tab 5: WhatsApp Patient Guidance */}
+              {activeTab === 'whatsapp' && (
+                <WhatsAppGuidance 
+                  patient={activePatient}
+                  onSendSuccess={handleWhatsAppSendSuccess}
+                  allPatients={patients}
+                  onSwitchPatient={setActivePatient}
+                />
+              )}
+
+              {/* Tab 6: Patient Records */}
+              {activeTab === 'records' && (
+                <PatientRecords 
+                  patients={patients}
+                  onSendWhatsApp={(p) => handleSelectPatient(p, 'whatsapp')}
+                  onViewSummary={(p) => handleSelectPatient(p, 'records')}
+                />
+              )}
+
+              {/* Tab 7: Discharge Summary History */}
+              {activeTab === 'history' && (
+                <DischargeHistory 
+                  patients={patients}
+                  onViewPatient={(p) => handleSelectPatient(p, 'records')}
+                />
+              )}
+
+              {/* Tab 8: Staff AI Assistant */}
+              {activeTab === 'assistant' && (
+                <StaffAIAssistant />
+              )}
+            </div>
+          </main>
         </div>
-      </div>
+      )}
     </div>
   );
 }
