@@ -18,6 +18,8 @@ import {
   Save
 } from 'lucide-react';
 
+import { confirmPatient } from '../services/api';
+
 export default function ExtractedInfoReview({ 
   extractedData, 
   onConfirmAndCreate, 
@@ -25,6 +27,8 @@ export default function ExtractedInfoReview({
 }) {
   const [formData, setFormData] = useState(extractedData || {});
   const [medicines, setMedicines] = useState(extractedData?.medicines || []);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const handleFieldChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -47,16 +51,53 @@ export default function ExtractedInfoReview({
     setMedicines(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleConfirmSubmit = (e) => {
+  const handleConfirmSubmit = async (e) => {
     e.preventDefault();
-    const finalPatient = {
-      ...formData,
-      medicines,
-      processingStatus: "OCR Extraction Complete",
-      guidanceStatus: "Ready to Send",
-      whatsappStatus: "Pending Send"
+    setIsSaving(true);
+    setSaveError(null);
+
+    const payload = {
+      patientId: formData.id || formData.patientId || `MG-PAT-${Date.now()}`,
+      patientName: formData.name || formData.patientName || 'Patient',
+      age: formData.age ? parseInt(formData.age, 10) : 45,
+      gender: formData.gender || 'Not specified',
+      phoneNumber: formData.phone || formData.phoneNumber || '+91 98765 43210',
+      whatsappNumber: formData.whatsappNumber || formData.phone || formData.phoneNumber || '+91 98765 43210',
+      diagnosis: formData.diagnosis || 'Clinical Discharge',
+      symptoms: formData.symptoms || '',
+      allergies: formData.allergies || 'None reported',
+      doctorName: formData.doctor || formData.doctorName || 'Attending Physician',
+      hospitalName: formData.hospital || formData.hospitalName || 'MediGuid Hospital',
+      admissionDate: formData.admissionDate || '',
+      dischargeDate: formData.dischargeDate || new Date().toISOString().split('T')[0],
+      followUpDate: formData.followUpDate || '',
+      followUpDepartment: formData.followUpDepartment || '',
+      dischargeInstructions: formData.dischargeInstructions || '',
+      dietInstructions: formData.dietInstructions || '',
+      warningSigns: formData.warningSigns || '',
+      medicines: medicines
     };
-    onConfirmAndCreate(finalPatient);
+
+    try {
+      const response = await confirmPatient(payload);
+      setIsSaving(false);
+      const saved = response.patient || payload;
+      const normalizedPatient = {
+        ...saved,
+        id: saved.patientId || payload.patientId,
+        name: saved.patientName || payload.patientName,
+        phone: saved.phoneNumber || saved.whatsappNumber || payload.phoneNumber,
+        doctor: saved.doctorName || payload.doctorName,
+        hospital: saved.hospitalName || payload.hospitalName,
+        medicines: saved.medicines && saved.medicines.length > 0 ? saved.medicines : medicines,
+        guidanceStatus: saved.guidanceStatus || "Ready to Send",
+        whatsappStatus: saved.whatsappStatus || "Pending Send"
+      };
+      onConfirmAndCreate(normalizedPatient);
+    } catch (err) {
+      setIsSaving(false);
+      setSaveError(err.message || 'Failed to save patient record to database.');
+    }
   };
 
   return (
@@ -371,21 +412,35 @@ export default function ExtractedInfoReview({
           </div>
         </div>
 
+        {/* Save Error Alert */}
+        {saveError && (
+          <div className="mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm font-medium">
+            ⚠️ Database Error: {saveError}
+          </div>
+        )}
+
         {/* 5. Sticky Bottom Action Bar with Required CTA */}
         <div className="review-submit-bar">
           <div className="submit-bar-info">
             <CheckCircle2 className="w-5 h-5 text-teal-600" />
-            <span>Ready to create official record and synthesize WhatsApp guidance for <strong>{formData.name || 'Patient'}</strong></span>
+            <span>Ready to create official record and synthesize WhatsApp guidance for <strong>{formData.name || formData.patientName || 'Patient'}</strong></span>
           </div>
 
           <button
             type="submit"
             className="btn-confirm-create"
             id="confirmCreatePatientBtn"
+            disabled={isSaving}
           >
-            <CheckCircle2 className="w-5 h-5" />
-            <span>Confirm & Create Patient Record</span>
-            <ArrowRight className="w-4 h-4 ml-1" />
+            {isSaving ? (
+              <span>Saving to Database...</span>
+            ) : (
+              <>
+                <CheckCircle2 className="w-5 h-5" />
+                <span>Confirm & Create Patient Record</span>
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </>
+            )}
           </button>
         </div>
       </form>

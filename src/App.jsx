@@ -11,6 +11,7 @@ import PatientRecords from './components/PatientRecords';
 import DischargeHistory from './components/DischargeHistory';
 import StaffAIAssistant from './components/StaffAIAssistant';
 import { INITIAL_PATIENTS } from './data/hospitalData';
+import { fetchPatients } from './services/api';
 import confetti from 'canvas-confetti';
 
 export default function App() {
@@ -26,7 +27,7 @@ export default function App() {
     hospital: 'MediGuid Central Hospital'
   });
 
-  // Patient database (persisted to localStorage if available)
+  // Patient database state
   const [patients, setPatients] = useState(() => {
     try {
       const saved = localStorage.getItem('mediguid_patients');
@@ -34,6 +35,31 @@ export default function App() {
     } catch (e) {}
     return INITIAL_PATIENTS;
   });
+
+  // Load from backend SQLite database on mount
+  useEffect(() => {
+    let mounted = true;
+    fetchPatients()
+      .then(dbPatients => {
+        if (mounted && Array.isArray(dbPatients) && dbPatients.length > 0) {
+          const normalized = dbPatients.map(p => ({
+            ...p,
+            id: p.patientId,
+            name: p.patientName,
+            phone: p.whatsappNumber || p.phoneNumber,
+            doctor: p.doctorName,
+            hospital: p.hospitalName,
+            foodInstructions: p.dietInstructions,
+            dailyCare: p.dischargeInstructions
+          }));
+          setPatients(normalized);
+        }
+      })
+      .catch(err => {
+        console.warn('Backend API not reachable, using local storage cache:', err);
+      });
+    return () => { mounted = false; };
+  }, []);
 
   // Current patient in focus
   const [extractedPatient, setExtractedPatient] = useState(null);

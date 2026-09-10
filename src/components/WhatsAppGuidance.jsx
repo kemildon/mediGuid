@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   MessageSquare, 
   Send, 
@@ -17,9 +17,12 @@ import {
   AlertTriangle, 
   Heart, 
   Building,
-  Languages
+  Languages,
+  AlertCircle,
+  Radio
 } from 'lucide-react';
 import { WHATSAPP_CATEGORIES, buildWhatsAppMessage } from '../data/hospitalData';
+import { fetchWhatsAppStatus, sendPatientGuidance } from '../services/api';
 
 export default function WhatsAppGuidance({ 
   patient, 
@@ -30,10 +33,31 @@ export default function WhatsAppGuidance({
   const [selectedCategory, setSelectedCategory] = useState("full");
   const [language, setLanguage] = useState("en"); // "en" or "ta"
   const [isSending, setIsSending] = useState(false);
-  const [sentStatus, setSentStatus] = useState(
-    patient?.whatsappStatus?.includes("Sent") ? "sent" : "ready" // "ready" | "sending" | "sent"
-  );
-  const [customPhone, setCustomPhone] = useState(patient?.phone || "+91 98765 43210");
+  const [sentStatus, setSentStatus] = useState("ready"); // "ready" | "sending" | "sent" | "unconfigured" | "error"
+  const [apiConfig, setApiConfig] = useState({ isConfigured: false, statusNotice: '' });
+  const [sendResult, setSendResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  
+  const patientPhone = patient?.whatsappNumber || patient?.phoneNumber || patient?.phone || "+91 98765 43210";
+  const [customPhone, setCustomPhone] = useState(patientPhone);
+
+  useEffect(() => {
+    if (patient) {
+      setCustomPhone(patient.whatsappNumber || patient.phoneNumber || patient.phone || "+91 98765 43210");
+    }
+  }, [patient]);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchWhatsAppStatus()
+      .then(res => {
+        if (mounted) setApiConfig(res);
+      })
+      .catch(() => {
+        if (mounted) setApiConfig({ isConfigured: false, statusNotice: 'WhatsApp API server unreachable' });
+      });
+    return () => { mounted = false; };
+  }, []);
 
   if (!patient) {
     return (
@@ -47,19 +71,42 @@ export default function WhatsAppGuidance({
     );
   }
 
+  const patientDisplayName = patient.patientName || patient.name || 'Patient';
   const messageText = buildWhatsAppMessage(patient, selectedCategory, language);
 
-  const handleSendWhatsApp = () => {
+  const handleSendWhatsApp = async () => {
     setIsSending(true);
-    setSentStatus("sending");
+    setErrorMessage(null);
+    setSendResult(null);
 
-    setTimeout(() => {
+    try {
+      const response = await sendPatientGuidance({
+        patientId: patient.patientId || patient.id,
+        category: selectedCategory,
+        language: language,
+        customMessage: messageText
+      });
+
       setIsSending(false);
-      setSentStatus("sent");
-      if (onSendSuccess) {
-        onSendSuccess(patient.id, selectedCategory);
+      setSendResult(response);
+
+      if (response.success) {
+        setSentStatus("sent");
+        if (onSendSuccess) {
+          onSendSuccess(patient.patientId || patient.id, selectedCategory);
+        }
+      } else if (response.isTestMode) {
+        setSentStatus("unconfigured");
+        setErrorMessage(response.error || 'WhatsApp sending is disabled because WhatsApp Business API credentials are not configured.');
+      } else {
+        setSentStatus("error");
+        setErrorMessage(response.error || 'WhatsApp message dispatch failed.');
       }
-    }, 1200);
+    } catch (err) {
+      setIsSending(false);
+      setSentStatus("error");
+      setErrorMessage(err.message || 'Network error connecting to WhatsApp API service.');
+    }
   };
 
   const handleDirectWhatsAppWeb = () => {
@@ -74,9 +121,22 @@ export default function WhatsAppGuidance({
       {/* 1. Header with Required Section Title */}
       <div className="section-header-row">
         <div>
-          <div className="section-pre-badge">
-            <MessageSquare className="w-4 h-4 text-emerald-600" />
-            <span>DIRECT PATIENT COMMUNICATION</span>
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <div className="section-pre-badge">
+              <MessageSquare className="w-4 h-4 text-emerald-600" />
+              <span>DIRECT PATIENT COMMUNICATION</span>
+            </div>
+            {apiConfig.isConfigured ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                WhatsApp Cloud API Connected
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                <AlertCircle className="w-3.5 h-3.5" />
+                API Not Configured (Test Mode)
+              </span>
+            )}
           </div>
           <h1 className="section-main-heading">WHATSAPP PATIENT GUIDANCE</h1>
           <p className="section-sub-text">
@@ -285,8 +345,8 @@ export default function WhatsAppGuidance({
                 )}
               </button>
 
-              {/* Success Banner (Required exact string) */}
-              {sentStatus === 'sent' && (
+          {/* Success Banner (Only when actual send succeeds) */}
+              {sentStatus === 'sent' && sendResult?.success && (
                 <div className="success-confirmation-card" id="guidanceSentSuccessBanner">
                   <div className="success-icon-wrap">
                     <CheckCircle2 className="w-7 h-7 text-emerald-600" />
@@ -294,9 +354,38 @@ export default function WhatsAppGuidance({
                   <div>
                     <h3 className="success-title">✓ Guidance Sent Successfully</h3>
                     <p className="success-sub">
-                      Delivered to <strong>{customPhone}</strong>. Message marked as Read (blue ticks).
+                      Delivered via WhatsApp Cloud API to <strong>{customPhone}</strong>.
                     </p>
+                    {sendResult?.messageId && (
+                      <div className="text-xs font-mono text-slate-500 mt-1">
+                        Meta Message ID: {sendResult.messageId}
+                      </div>
+                    )}
                   </div>
+                </div>
+              )}
+
+              {/* Unconfigured Notice (When API is not configured) */}
+              {sentStatus === 'unconfigured' && (
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm">
+                  <div className="font-semibold flex items-center gap-2 mb-1">
+                    <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                    <span>WhatsApp sending is disabled because WhatsApp Business API credentials are not configured.</span>
+                  </div>
+                  <p className="text-xs text-amber-800 mt-1">
+                    Guidance was structured and logged, but live delivery to {customPhone} requires Meta API tokens in .env. Click <strong>Open in WhatsApp Web</strong> below to send manually.
+                  </p>
+                </div>
+              )}
+
+              {/* Error Notice */}
+              {sentStatus === 'error' && (
+                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm">
+                  <div className="font-semibold flex items-center gap-2 mb-1">
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                    <span>WhatsApp Dispatch Failed</span>
+                  </div>
+                  <p className="text-xs mt-1">{errorMessage || 'Failed to dispatch message.'}</p>
                 </div>
               )}
 

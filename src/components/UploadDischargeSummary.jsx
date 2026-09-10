@@ -14,6 +14,7 @@ import {
   Cpu
 } from 'lucide-react';
 import { SAMPLE_DISCHARGE_PRESETS } from '../data/hospitalData';
+import { uploadDischargeFile } from '../services/api';
 
 export default function UploadDischargeSummary({ onExtractionComplete }) {
   const [selectedPreset, setSelectedPreset] = useState(SAMPLE_DISCHARGE_PRESETS[0]);
@@ -22,6 +23,7 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState(0); // 0: Idle, 1: Uploading, 2: Reading Document, 3: Extracting Information, 4: Creating Patient Record
+  const [errorMessage, setErrorMessage] = useState(null);
   const fileInputRef = useRef(null);
 
   // Steps matching user's exact specification
@@ -35,6 +37,7 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
   const handleSelectPreset = (preset) => {
     setSelectedPreset(preset);
     setUploadedFile(null);
+    setErrorMessage(null);
     setPreviewText(preset.previewText);
   };
 
@@ -42,10 +45,18 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
     const file = e.target.files[0];
     if (file) {
       setUploadedFile(file);
-      // Generate realistic preview text based on filename
-      setPreviewText(
-        `MEDIGUID CENTRAL MULTI-SPECIALTY HOSPITAL\nDEPARTMENT OF GENERAL MEDICINE\nDISCHARGE SUMMARY FILE: ${file.name.toUpperCase()}\nSize: ${(file.size / 1024).toFixed(1)} KB\n\nPatient Name: Arun\nPatient ID: MG-PAT-2026-081\nAge: 52 Yrs | Gender: Male | Phone: +91 98765 43210\nAdmission Date: 02-09-2026 | Discharge Date: 08-09-2026\nConsultant: Dr. R. K. Sharma, MD\n\nDIAGNOSIS:\nType 2 Diabetes Mellitus (Uncontrolled)\n\nMEDICATIONS:\n1. Tab Metformin 500mg - 1 tab twice daily (After food)\n2. Tab Glimepiride 1mg - 1 tab morning (Before food)\n3. Tab Atorvastatin 10mg - 1 tab night (After food)\n\nDIETARY ADVICE:\nStrict diabetic diet. Avoid all sugar, sweets, and high-carb refined grains.\n\nFOLLOW UP:\nReview in 2 weeks on 20-09-2026.`
-      );
+      setErrorMessage(null);
+      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          setPreviewText(evt.target.result);
+        };
+        reader.readAsText(file);
+      } else {
+        setPreviewText(
+          `MEDIGUID CENTRAL MULTI-SPECIALTY HOSPITAL\nFILE: ${file.name.toUpperCase()}\nType: ${file.type || 'Clinical Document'}\nSize: ${(file.size / 1024).toFixed(1)} KB\n\nReady for optical neural OCR extraction and clinical NLP parsing.\nClick "PROCESS SUMMARY" below to begin.`
+        );
+      }
     }
   };
 
@@ -64,35 +75,58 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       setUploadedFile(file);
-      setPreviewText(
-        `MEDIGUID CENTRAL MULTI-SPECIALTY HOSPITAL\nFILE: ${file.name.toUpperCase()}\nDocument detected. Optical OCR ready.`
-      );
+      setErrorMessage(null);
+      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          setPreviewText(evt.target.result);
+        };
+        reader.readAsText(file);
+      } else {
+        setPreviewText(
+          `MEDIGUID CENTRAL MULTI-SPECIALTY HOSPITAL\nFILE: ${file.name.toUpperCase()}\nType: ${file.type || 'Clinical Document'}\nSize: ${(file.size / 1024).toFixed(1)} KB\n\nReady for optical neural OCR extraction and clinical NLP parsing.\nClick "PROCESS SUMMARY" below to begin.`
+        );
+      }
     }
   };
 
-  const handleProcessSummary = () => {
+  const handleProcessSummary = async () => {
     setIsProcessing(true);
+    setErrorMessage(null);
     setProcessingStep(1); // Uploading
 
-    setTimeout(() => {
-      setProcessingStep(2); // Reading Document
-    }, 700);
+    const stepTimer1 = setTimeout(() => setProcessingStep(2), 600); // Reading Document
+    const stepTimer2 = setTimeout(() => setProcessingStep(3), 1200); // Extracting Information
 
-    setTimeout(() => {
-      setProcessingStep(3); // Extracting Information
-    }, 1500);
+    try {
+      let fileToUpload = uploadedFile;
+      if (!fileToUpload && selectedPreset) {
+        // Use selected preset's text as a real file
+        const blob = new Blob([selectedPreset.previewText], { type: 'text/plain' });
+        fileToUpload = new File([blob], `${selectedPreset.id}.txt`, { type: 'text/plain' });
+      }
 
-    setTimeout(() => {
+      if (!fileToUpload) {
+        throw new Error('Please select a sample summary or upload a discharge file.');
+      }
+
+      const result = await uploadDischargeFile(fileToUpload);
+      clearTimeout(stepTimer1);
+      clearTimeout(stepTimer2);
       setProcessingStep(4); // Creating Patient Record
-    }, 2300);
 
-    setTimeout(() => {
+      setTimeout(() => {
+        setIsProcessing(false);
+        setProcessingStep(0);
+        onExtractionComplete(result.extractedData);
+      }, 500);
+    } catch (err) {
+      clearTimeout(stepTimer1);
+      clearTimeout(stepTimer2);
       setIsProcessing(false);
       setProcessingStep(0);
-      // Pass the extracted data to confirmation screen
-      const extracted = selectedPreset ? selectedPreset.extractedData : SAMPLE_DISCHARGE_PRESETS[0].extractedData;
-      onExtractionComplete(extracted);
-    }, 3100);
+      setErrorMessage(err.message || 'Unable to extract patient information from this document.');
+    }
   };
 
   return (
@@ -135,6 +169,24 @@ export default function UploadDischargeSummary({ onExtractionComplete }) {
           })}
         </div>
       </div>
+
+      {/* Ingestion Error Alert Display */}
+      {errorMessage && (
+        <div className="mb-4 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-800 shadow-sm" role="alert">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <h4 className="font-semibold text-sm">Clinical Extraction Notice</h4>
+            <p className="text-sm mt-0.5">{errorMessage}</p>
+          </div>
+          <button 
+            type="button" 
+            onClick={() => setErrorMessage(null)} 
+            className="text-red-600 hover:text-red-800 text-xs font-semibold px-2 py-1 rounded bg-red-100 hover:bg-red-200 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* 3. Main Workspace: Upload Dropzone & Document Previewer */}
       <div className="upload-workspace-grid">

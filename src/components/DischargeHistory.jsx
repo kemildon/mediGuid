@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   History, 
   FileText, 
@@ -6,15 +6,38 @@ import {
   Clock, 
   ExternalLink, 
   Eye, 
-  ScanLine,
-  Send,
-  Download
+  ScanLine, 
+  Send, 
+  Download,
+  UploadCloud
 } from 'lucide-react';
+import { fetchDischargeHistory } from '../services/api';
 
 export default function DischargeHistory({ 
   patients = [], 
   onViewPatient 
 }) {
+  const [historyRecords, setHistoryRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchDischargeHistory()
+      .then(records => {
+        if (mounted) {
+          setHistoryRecords(records || []);
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        console.warn('Could not load discharge history from server:', err);
+        if (mounted) setLoading(false);
+      });
+    return () => { mounted = false; };
+  }, [patients]);
+
+  const displayList = historyRecords.length > 0 ? historyRecords : patients;
+
   return (
     <div className="discharge-history-root">
       {/* 1. Header with Required Title */}
@@ -46,50 +69,61 @@ export default function DischargeHistory({
               </tr>
             </thead>
             <tbody>
-              {patients.map((p) => {
-                const isSent = p.whatsappStatus?.includes('Sent');
-                return (
-                  <tr key={p.id}>
-                    <td>
-                      <div className="font-semibold text-slate-800">{p.name}</div>
-                      <div className="text-xs text-slate-400">{p.diagnosis}</div>
-                    </td>
-                    <td className="font-mono text-teal-800 font-medium">{p.id}</td>
-                    <td className="text-sm text-slate-600">
-                      {p.uploadDate || '08 September 2026, 11:30 AM'}
-                    </td>
-                    <td>
-                      <span className="status-badge complete">
-                        <ScanLine className="w-3.5 h-3.5 text-teal-600" />
-                        <span>{p.processingStatus || 'OCR Extraction Complete'}</span>
-                      </span>
-                    </td>
-                    <td>
-                      {isSent ? (
-                        <span className="status-badge sent">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Sent on WhatsApp</span>
+              {displayList.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-slate-400">
+                    No discharge summaries recorded in database yet.
+                  </td>
+                </tr>
+              ) : (
+                displayList.map((p, idx) => {
+                  const isSent = (p.whatsappStatus || '').includes('Sent');
+                  const pName = p.patientName || p.name || 'Patient';
+                  const pId = p.patientId || p.id || `MG-PAT-${idx + 1}`;
+                  const uploadTime = p.uploadDate ? new Date(p.uploadDate).toLocaleString() : 'Recent';
+                  return (
+                    <tr key={p.id || idx}>
+                      <td>
+                        <div className="font-semibold text-slate-800">{pName}</div>
+                        <div className="text-xs text-slate-400">{p.diagnosis || p.originalFileName || 'Discharge Document'}</div>
+                      </td>
+                      <td className="font-mono text-teal-800 font-medium">{pId}</td>
+                      <td className="text-sm text-slate-600">
+                        {uploadTime}
+                      </td>
+                      <td>
+                        <span className="status-badge complete">
+                          <ScanLine className="w-3.5 h-3.5 text-teal-600" />
+                          <span>{p.processingStatus || 'OCR Extraction Complete'}</span>
                         </span>
-                      ) : (
-                        <span className="status-badge ready">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>Ready to Send</span>
-                        </span>
-                      )}
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => onViewPatient(p)}
-                        className="btn-history-view"
-                        title="View Extracted Summary"
-                      >
-                        <Eye className="w-4 h-4" />
-                        <span>View Summary</span>
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td>
+                        {isSent ? (
+                          <span className="status-badge sent">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Sent on WhatsApp</span>
+                          </span>
+                        ) : (
+                          <span className="status-badge ready">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>Ready to Send</span>
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => onViewPatient(p)}
+                          className="btn-history-view"
+                          title="View Extracted Summary"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span>View Summary</span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

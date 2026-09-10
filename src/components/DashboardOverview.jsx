@@ -16,23 +16,37 @@ import {
   Eye
 } from 'lucide-react';
 
+import { fetchDashboardStats } from '../services/api';
+
 export default function DashboardOverview({ 
   patients = [], 
   onNavigateTab, 
   onSelectPatient 
 }) {
-  // Compute live statistics based on patient database
-  const totalPatients = 148 + patients.length;
-  const newDischarges = 12;
-  const summariesProcessed = 142 + patients.length;
-  const guidanceSentCount = patients.filter(p => p.whatsappStatus?.includes('Sent')).length + 138;
-  const pendingGuidanceCount = patients.filter(p => p.guidanceStatus === 'Ready to Send').length;
+  const [stats, setStats] = React.useState(null);
+
+  React.useEffect(() => {
+    let mounted = true;
+    fetchDashboardStats()
+      .then(data => {
+        if (mounted && data) setStats(data);
+      })
+      .catch(err => console.warn('Could not load server dashboard stats:', err));
+    return () => { mounted = false; };
+  }, [patients]);
+
+  // Compute live statistics based on real patient records & DB queries
+  const totalPatients = stats ? stats.totalPatients : patients.length;
+  const newDischarges = stats ? stats.newDischargesToday : 0;
+  const summariesProcessed = stats ? stats.summariesProcessed : patients.length;
+  const guidanceSentCount = stats ? stats.guidanceSent : patients.filter(p => p.whatsappStatus?.includes('Sent')).length;
+  const pendingGuidanceCount = stats ? stats.pendingGuidance : patients.filter(p => p.guidanceStatus === 'Ready to Send' || p.whatsappStatus?.includes('Pending')).length;
 
   const kpis = [
     {
       title: 'Total Patients',
       value: totalPatients,
-      subtitle: 'Registered in MediGuid',
+      subtitle: 'Registered in MediGuid Database',
       icon: Users,
       color: 'blue'
     },
@@ -46,7 +60,7 @@ export default function DashboardOverview({
     {
       title: 'Summaries Processed',
       value: summariesProcessed,
-      subtitle: 'AI OCR Extraction 99.4%',
+      subtitle: 'Discharge records ingested',
       icon: FileCheck2,
       color: 'indigo'
     },

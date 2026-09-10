@@ -1,12 +1,22 @@
-﻿# OS and Editor files
+# OS and Editor files
 .DS_Store
 Thumbs.db
 *.log
 .vscode/
 .idea/
 
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+
+# Database & Uploads
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+uploads/*
+!uploads/.gitkeep
+
 # Node / Scratch
 node_modules/
-
 dist/
-

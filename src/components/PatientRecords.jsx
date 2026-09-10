@@ -26,19 +26,25 @@ export default function PatientRecords({
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [selectedPatientModal, setSelectedPatientModal] = useState(null);
 
+  const getPatientName = (p) => p.name || p.patientName || 'Patient';
+  const getPatientId = (p) => p.id || p.patientId || '';
+  const getPatientDiag = (p) => p.diagnosis || 'Clinical Diagnosis';
+  const getPatientPhone = (p) => p.phone || p.phoneNumber || p.whatsappNumber || '';
+
   const filteredPatients = patients.filter(p => {
-    const matchesSearch = 
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.diagnosis.toLowerCase().includes(searchQuery.toLowerCase());
-    
+    const pName = getPatientName(p).toLowerCase();
+    const pId = getPatientId(p).toLowerCase();
+    const pDiag = getPatientDiag(p).toLowerCase();
+    const q = searchQuery.toLowerCase();
+
+    const matchesSearch = pName.includes(q) || pId.includes(q) || pDiag.includes(q);
     if (!matchesSearch) return false;
 
     if (filterStatus === 'SENT') {
-      return p.whatsappStatus?.includes('Sent');
+      return (p.whatsappStatus || '').includes('Sent');
     }
     if (filterStatus === 'PENDING') {
-      return !p.whatsappStatus?.includes('Sent');
+      return !(p.whatsappStatus || '').includes('Sent');
     }
     return true;
   });
@@ -126,25 +132,29 @@ export default function PatientRecords({
                 </tr>
               ) : (
                 filteredPatients.map((p) => {
-                  const isSent = p.whatsappStatus?.includes('Sent');
+                  const isSent = (p.whatsappStatus || '').includes('Sent');
+                  const pId = getPatientId(p);
+                  const pName = getPatientName(p);
+                  const pPhone = getPatientPhone(p);
+                  const pDiag = getPatientDiag(p);
                   return (
                     <tr 
-                      key={p.id}
+                      key={pId || p.id}
                       onClick={() => handleOpenPatientModal(p)}
                       className="cursor-pointer hover:bg-slate-50 transition-colors"
                     >
-                      <td className="font-mono text-teal-800 font-semibold">{p.id}</td>
+                      <td className="font-mono text-teal-800 font-semibold">{pId}</td>
                       <td>
-                        <div className="font-semibold text-slate-900">{p.name}</div>
-                        <div className="text-xs text-slate-400 font-mono">{p.phone} &bull; {p.age} Yrs ({p.gender?.charAt(0)})</div>
+                        <div className="font-semibold text-slate-900">{pName}</div>
+                        <div className="text-xs text-slate-400 font-mono">{pPhone} &bull; {p.age || '45'} Yrs ({p.gender?.charAt(0) || 'M'})</div>
                       </td>
                       <td>
-                        <span className="disease-tag">{p.diagnosis}</span>
+                        <span className="disease-tag">{pDiag}</span>
                       </td>
-                      <td className="text-slate-600 text-sm">{p.dischargeDate}</td>
+                      <td className="text-slate-600 text-sm">{p.dischargeDate || 'Recent'}</td>
                       <td>
-                        <span className={`status-pill-small ${p.guidanceStatus === 'Ready to Send' ? 'ready' : 'complete'}`}>
-                          {p.guidanceStatus}
+                        <span className={`status-pill-small ${(p.guidanceStatus || 'Ready to Send') === 'Ready to Send' ? 'ready' : 'complete'}`}>
+                          {p.guidanceStatus || 'Ready to Send'}
                         </span>
                       </td>
                       <td>
@@ -207,16 +217,16 @@ export default function PatientRecords({
               {/* Header Info Banner */}
               <div className="patient-card-banner">
                 <div>
-                  <h3 className="patient-banner-name">{selectedPatientModal.name}</h3>
+                  <h3 className="patient-banner-name">{getPatientName(selectedPatientModal)}</h3>
                   <div className="patient-banner-meta">
-                    <span>ID: {selectedPatientModal.id}</span> &bull; 
-                    <span>{selectedPatientModal.age} Yrs, {selectedPatientModal.gender}</span> &bull; 
-                    <span>WhatsApp: {selectedPatientModal.phone}</span>
+                    <span>ID: {getPatientId(selectedPatientModal)}</span> &bull; 
+                    <span>{selectedPatientModal.age || '45'} Yrs, {selectedPatientModal.gender || 'Patient'}</span> &bull; 
+                    <span>WhatsApp: {getPatientPhone(selectedPatientModal)}</span>
                   </div>
                 </div>
                 <div className="banner-status-box">
                   <span className="text-xs uppercase tracking-wider text-slate-400">Diagnosis</span>
-                  <div className="font-semibold text-teal-900">{selectedPatientModal.diagnosis}</div>
+                  <div className="font-semibold text-teal-900">{getPatientDiag(selectedPatientModal)}</div>
                 </div>
               </div>
 
@@ -224,19 +234,19 @@ export default function PatientRecords({
               <div className="grid-2-col mb-4">
                 <div className="info-box">
                   <span className="info-label">Attending Physician:</span>
-                  <span className="info-value">{selectedPatientModal.doctor}</span>
+                  <span className="info-value">{selectedPatientModal.doctor || selectedPatientModal.doctorName || 'Attending Physician'}</span>
                 </div>
                 <div className="info-box">
                   <span className="info-label">Hospital:</span>
-                  <span className="info-value">{selectedPatientModal.hospital}</span>
+                  <span className="info-value">{selectedPatientModal.hospital || selectedPatientModal.hospitalName || 'MediGuid Hospital'}</span>
                 </div>
                 <div className="info-box">
                   <span className="info-label">Admission Date:</span>
-                  <span className="info-value">{selectedPatientModal.admissionDate}</span>
+                  <span className="info-value">{selectedPatientModal.admissionDate || 'N/A'}</span>
                 </div>
                 <div className="info-box">
                   <span className="info-label">Discharge Date:</span>
-                  <span className="info-value">{selectedPatientModal.dischargeDate}</span>
+                  <span className="info-value">{selectedPatientModal.dischargeDate || 'N/A'}</span>
                 </div>
               </div>
 
@@ -244,14 +254,14 @@ export default function PatientRecords({
               <div className="modal-section-card">
                 <div className="modal-section-title">
                   <Pill className="w-4 h-4 text-indigo-600" />
-                  <span>Prescribed Medications ({selectedPatientModal.medicines?.length})</span>
+                  <span>Prescribed Medications ({selectedPatientModal.medicines?.length || 0})</span>
                 </div>
                 <div className="modal-meds-list">
                   {selectedPatientModal.medicines?.map((m, idx) => (
                     <div key={idx} className="modal-med-row">
-                      <div className="font-semibold text-slate-800">{m.name}</div>
+                      <div className="font-semibold text-slate-800">{m.name || m.medicineName}</div>
                       <div className="text-sm text-slate-600">
-                        {m.dosage} &bull; {m.frequency} &bull; {m.foodRelation} (Duration: {m.duration})
+                        {m.dosage} &bull; {m.frequency} &bull; {m.foodRelation || m.beforeOrAfterFood || 'After food'} (Duration: {m.duration || '30 Days'})
                       </div>
                     </div>
                   ))}
@@ -265,7 +275,7 @@ export default function PatientRecords({
                   <span>Food & Dietary Instructions</span>
                 </div>
                 <p className="text-sm text-slate-700 leading-relaxed">
-                  {selectedPatientModal.foodInstructions}
+                  {selectedPatientModal.foodInstructions || selectedPatientModal.dietInstructions || 'Follow a balanced nutritious diet as advised.'}
                 </p>
               </div>
 
